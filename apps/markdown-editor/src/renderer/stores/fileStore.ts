@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import type { FileState, RecentFile } from '@shared/types';
+import { useEditorStore } from './editorStore';
 
 interface FileStore {
   currentFile: FileState | null;
@@ -115,5 +116,3 @@ export const useFileStore = create<FileStore>((set, get) => ({
     set({ error: null });
   },
 }));
-
-import { useEditorStore } from './editorStore';
