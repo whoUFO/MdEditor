@@ -1,0 +1,44 @@
+.file-tree {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.file-tree-header {
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  border-bottom: 1px solid var(--color-border);
+  background-color: var(--color-bg-primary);
+}
+
+.file-tree-content {
+  flex: 1;
+  overflow: auto;
+  padding: var(--spacing-xs);
+}
+
+.file-tree-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  border-radius: var(--radius-sm);
+  transition: background-color var(--transition-fast);
+  
+  &:hover {
+    background-color: var(--color-bg-tertiary);
+  }
+  
+  &.directory {
+    color: var(--color-accent);
+  }
+  
+  &.file {
+    color: var(--color-text-secondary);
+  }
+}
