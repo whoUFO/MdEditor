@@ -1,0 +1,7 @@
+{
+  "name": "@markdown-editor/tsconfig",
+  "version": "0.1.0",
+  "private": true,
+  "main": "index.json",
+  "files": ["base.json", "react.json", "electron.json"]
+}
