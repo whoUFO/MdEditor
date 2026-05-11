@@ -4,7 +4,7 @@
 
 | 项目 | 内容 |
 |------|------|
-| 文档版本 | v1.0.1 |
+| 文档版本 | v1.1.0 |
 | 创建日期 | 2026-05-11 |
 | 最后更新 | 2026-05-11 |
 | 项目经理 | 胡宇峰 |
@@ -14,59 +14,32 @@
 
 ## 执行摘要
 
-本报告记录了 Electron Markdown Editor 项目的开发任务执行情况，包括任务状态、验收结果和后续计划。
+本报告记录了 Electron Markdown Editor 项目的开发任务执行情况。
 
-**当前进度**: M0 阶段全部完成 (7/7 任务)
-
----
-
-## 阶段一：基础设施搭建 (M0)
-
-### M0-1: Monorepo 基础配置 ✅
-
-**执行时间**: 2026-05-11
-**执行角色**: BE (Electron 开发工程师)
-**状态**: ✅ 已完成并验收
-
-#### 任务清单
-
-| 任务 ID | 任务名称 | 状态 | 验收结果 |
-|---------|---------|------|---------|
-| M0-1.1 | pnpm-workspace.yaml | ✅ | workspace 配置正确，包含 apps/* 和 packages/* |
-| M0-1.2 | turbo.json | ✅ | pipeline 配置完整，包含 build/dev/lint/test |
-| M0-1.3 | 根 package.json | ✅ | scripts 配置正确，依赖已声明 |
-
-#### 配置文件
-
-**pnpm-workspace.yaml**:
-```yaml
-packages:
-  - 'apps/*'
-  - 'packages/*'
-```
+**当前进度**: P1 阶段全部完成 (10/10 任务)
 
 ---
 
-### M0-2: TypeScript 配置包 ✅
+## 阶段一：基础设施搭建 (M0) ✅
 
-**执行时间**: 2026-05-11
-**执行角色**: BE (Electron 开发工程师)
-**状态**: ✅ 已完成并验收
+### M0-1 ~ M0-7: 全部完成
 
-#### 任务清单
-
-| 任务 ID | 任务名称 | 状态 | 验收结果 |
-|---------|---------|------|---------|
-| M0-2.1 | tsconfig 包结构 | ✅ | 目录结构正确 |
-| M0-2.2 | base.json | ✅ | strict 模式开启，所有严格检查启用 |
-| M0-2.3 | react.json | ✅ | JSX 配置正确，路径别名 @/* |
-| M0-2.4 | electron.json | ✅ | Node 和 Electron 类型正确 |
+| 任务 | 状态 | 完成率 |
+|------|------|--------|
+| M0-1: Monorepo 基础配置 | ✅ | 100% |
+| M0-2: TypeScript 配置包 | ✅ | 100% |
+| M0-3: ESLint 配置包 | ✅ | 100% |
+| M0-4: Shared 共享包 | ✅ | 100% |
+| M0-5: Electron 主进程框架 | ✅ | 100% |
+| M0-6: Preload 桥接层 | ✅ | 100% |
+| M0-7: React 基础框架 | ✅ | 100% |
 
 ---
 
-### M0-3: ESLint 配置包 ✅
+## 阶段二：核心功能 (P1) ✅
 
-**执行时间**: 2026-05-11
+### P1-1: CodeMirror 编辑器集成 ✅
+
 **执行角色**: FE (前端开发工程师)
 **状态**: ✅ 已完成并验收
 
@@ -74,190 +47,48 @@ packages:
 
 | 任务 ID | 任务名称 | 状态 | 验收结果 |
 |---------|---------|------|---------|
-| M0-3.1 | eslint-config 包结构 | ✅ | 目录结构正确 |
-| M0-3.2 | ESLint 规则配置 | ✅ | TypeScript + React + Prettier 集成 |
-| M0-3.3 | Prettier 配置 | ✅ | 格式化配置正确 |
-
----
-
-### M0-4: Shared 共享包 ✅
-
-**执行时间**: 2026-05-11
-**执行角色**: BE + FE
-**状态**: ✅ 已完成并验收
-
-#### 任务清单
-
-| 任务 ID | 任务名称 | 状态 | 验收结果 |
-|---------|---------|------|---------|
-| M0-4.1 | shared 包结构 | ✅ | 目录结构正确，package.json 配置正确 |
-| M0-4.2 | 类型接口定义 | ✅ | FileState, EditorState, UIState, ElectronAPI 等完整 |
-| M0-4.3 | 工具函数实现 | ✅ | debounce, countWords, parseMarkdownHeading 等工具函数实现 |
-
-#### 类型定义
-
-```typescript
-// packages/shared/src/types/index.ts
-interface FileState {
-  path: string;
-  name: string;
-  content: string;
-  encoding: string;
-  isModified: boolean;
-}
-
-interface EditorState {
-  content: string;
-  cursorPosition: { line: number; column: number };
-  selection: { from: number; to: number } | null;
-  isDirty: boolean;
-}
-
-interface UIState {
-  previewVisible: boolean;
-  splitRatio: number;
-  sidebarVisible: boolean;
-  theme: 'light' | 'dark';
-}
-
-interface ElectronAPI {
-  files: {
-    open: () => Promise<FileResult | null>;
-    save: (path: string, content: string, encoding: string) => Promise<boolean>;
-    saveAs: (content: string, encoding?: string) => Promise<string | null>;
-    readDirectory: (path: string) => Promise<FileTreeItem[]>;
-  };
-  window: {
-    minimize: () => void;
-    maximize: () => void;
-    close: () => void;
-    isMaximized: () => Promise<boolean>;
-  };
-  app: {
-    getVersion: () => Promise<string>;
-    getPlatform: () => Promise<string>;
-  };
-}
-```
-
-#### 验收标准
-
-- [x] 类型定义完整且准确
-- [x] 工具函数可用
-- [x] 可被其他包正确引用
-
----
-
-### M0-5: Electron 主进程框架 ✅
-
-**执行时间**: 2026-05-11
-**执行角色**: BE (Electron 开发工程师)
-**状态**: ✅ 已完成并验收
-
-#### 任务清单
-
-| 任务 ID | 任务名称 | 状态 | 验收结果 |
-|---------|---------|------|---------|
-| M0-5.1 | main 目录结构 | ✅ | src/main/index.ts 入口文件正确 |
-| M0-5.2 | 窗口管理 | ✅ | BrowserWindow 配置完整，1400x900 默认尺寸 |
-| M0-5.3 | CSP 安全策略 | ✅ | contextIsolation, sandbox, nodeIntegration: false |
-| M0-5.4 | 应用菜单 | ✅ | 文件、编辑、视图、帮助菜单完整 |
-| M0-5.5 | IPC 处理器 | ✅ | files:open/save/saveAs/readDirectory 实现完整 |
-| M0-5.6 | 编码检测 | ✅ | jschardet + iconv-lite 实现编码自动检测 |
+| P1-1.1 | 安装 CodeMirror 依赖 | ✅ | package.json 已包含所有依赖 |
+| P1-1.2 | 创建编辑器组件 | ✅ | Editor.tsx 完整实现 |
+| P1-1.3 | 配置 Markdown 语法 | ✅ | markdown() + languages 配置 |
+| P1-1.4 | 配置编辑器主题 | ✅ | oneDark 主题可用 |
 
 #### 核心实现
 
 ```typescript
-// apps/markdown-editor/src/main/index.ts
-const mainWindow = new BrowserWindow({
-  width: 1400,
-  height: 900,
-  minWidth: 800,
-  minHeight: 600,
-  webPreferences: {
-    contextIsolation: true,
-    sandbox: true,
-    nodeIntegration: false,
-    preload: path.join(__dirname, '../preload/index.js'),
-  },
+// apps/markdown-editor/src/renderer/components/editor/Editor.tsx
+import { EditorView, basicSetup } from 'codemirror';
+import { markdown, markdownLanguage } from '@codemirror/lang-markdown';
+import { languages } from '@codemirror/language-data';
+
+const view = new EditorView({
+  doc: content,
+  extensions: [
+    basicSetup,
+    markdown({ base: markdownLanguage, codeLanguages: languages }),
+    EditorView.updateListener.of((update) => {
+      if (update.docChanged) {
+        setContent(update.state.doc.toString());
+      }
+      // 光标位置追踪
+      const cursor = update.state.selection.main.head;
+      const line = update.state.doc.lineAt(cursor);
+      setCursorPosition({ line: line.number, column: cursor - line.from + 1 });
+    }),
+  ],
+  parent: editorRef.current,
 });
 ```
 
-#### IPC 通道
-
-| 通道 | 类型 | 说明 |
-|------|------|------|
-| files:open | invoke | 打开文件对话框 |
-| files:save | invoke | 保存文件 |
-| files:saveAs | invoke | 另存为对话框 |
-| files:readDirectory | invoke | 读取目录 |
-| window:minimize | invoke | 最小化窗口 |
-| window:maximize | invoke | 最大化/还原窗口 |
-| window:close | invoke | 关闭窗口 |
-| window:isMaximized | invoke | 检查是否最大化 |
-| app:getVersion | invoke | 获取应用版本 |
-| app:getPlatform | invoke | 获取平台信息 |
-
 #### 验收标准
 
-- [x] 窗口可正常创建
-- [x] CSP 配置正确
-- [x] 菜单功能正常
-- [x] IPC 通信正常
+- [x] CodeMirror 编辑器正常显示
+- [x] Markdown 语法高亮正确
+- [x] 主题切换正常
 
 ---
 
-### M0-6: Preload 桥接层 ✅
+### P1-2: 编辑器状态管理 ✅
 
-**执行时间**: 2026-05-11
-**执行角色**: BE (Electron 开发工程师)
-**状态**: ✅ 已完成并验收
-
-#### 任务清单
-
-| 任务 ID | 任务名称 | 状态 | 验收结果 |
-|---------|---------|------|---------|
-| M0-6.1 | preload 目录结构 | ✅ | src/preload/index.ts 入口文件正确 |
-| M0-6.2 | contextBridge API | ✅ | files, window, app API 完整暴露 |
-| M0-6.3 | IPC 通道 | ✅ | 与主进程 IPC 通道对应 |
-
-#### 核心实现
-
-```typescript
-// apps/markdown-editor/src/preload/index.ts
-const electronAPI: ElectronAPI = {
-  files: {
-    open: () => ipcRenderer.invoke('files:open'),
-    save: (path, content, encoding) => ipcRenderer.invoke('files:save', path, content, encoding),
-    saveAs: (content, encoding) => ipcRenderer.invoke('files:saveAs', content, encoding),
-    readDirectory: (path) => ipcRenderer.invoke('files:readDirectory', path),
-  },
-  window: {
-    minimize: () => ipcRenderer.invoke('window:minimize'),
-    maximize: () => ipcRenderer.invoke('window:maximize'),
-    close: () => ipcRenderer.invoke('window:close'),
-    isMaximized: () => ipcRenderer.invoke('window:isMaximized'),
-  },
-  app: {
-    getVersion: () => ipcRenderer.invoke('app:getVersion'),
-    getPlatform: () => ipcRenderer.invoke('app:getPlatform'),
-  },
-};
-
-contextBridge.exposeInMainWorld('electronAPI', electronAPI);
-```
-
-#### 验收标准
-
-- [x] API 正确暴露
-- [x] IPC 通信正常
-- [x] 类型检查通过
-
----
-
-### M0-7: React 基础框架 ✅
-
-**执行时间**: 2026-05-11
 **执行角色**: FE (前端开发工程师)
 **状态**: ✅ 已完成并验收
 
@@ -265,105 +96,360 @@ contextBridge.exposeInMainWorld('electronAPI', electronAPI);
 
 | 任务 ID | 任务名称 | 状态 | 验收结果 |
 |---------|---------|------|---------|
-| M0-7.1 | Vite 配置 | ✅ | vite.config.ts 配置正确 |
-| M0-7.2 | React 入口 | ✅ | main.tsx + App.tsx 入口正确 |
-| M0-7.3 | 全局样式 | ✅ | index.css + CSS 变量定义完整 |
-| M0-7.4 | 组件结构 | ✅ | components/hooks/stores/utils 目录完整 |
+| P1-2.1 | 创建 editorStore | ✅ | Zustand store 完整实现 |
+| P1-2.2 | 实现内容同步 | ✅ | 内容更新自动同步 |
+| P1-2.3 | 实现光标位置追踪 | ✅ | line/column 实时更新 |
+
+#### 核心实现
+
+```typescript
+// apps/markdown-editor/src/renderer/stores/editorStore.ts
+interface EditorStore extends EditorState {
+  setContent: (content: string) => void;
+  setCursorPosition: (pos: { line: number; column: number }) => void;
+  setSelection: (selection: { from: number; to: number } | null) => void;
+  markDirty: (dirty: boolean) => void;
+  insertText: (text: string, at?: number) => void;
+  getSelectedText: () => string;
+}
+
+export const useEditorStore = create<EditorStore>((set, get) => ({
+  content: '',
+  cursorPosition: { line: 1, column: 1 },
+  selection: null,
+  isDirty: false,
+  // ... 实现
+}));
+```
+
+#### 验收标准
+
+- [x] 状态管理正常
+- [x] 内容同步正确
+- [x] 位置显示正确
+
+---
+
+### P1-3: 双栏布局组件 ✅
+
+**执行角色**: FE (前端开发工程师)
+**状态**: ✅ 已完成并验收
+
+#### 任务清单
+
+| 任务 ID | 任务名称 | 状态 | 验收结果 |
+|---------|---------|------|---------|
+| P1-3.1 | 创建 MainLayout 组件 | ✅ | 三区域布局完成 |
+| P1-3.2 | 创建 EditorPane 组件 | ✅ | 编辑区正常 |
+| P1-3.3 | 创建 PreviewPane 组件 | ✅ | 预览区正常 |
+| P1-3.4 | 实现分割线拖动 | ✅ | resizer div 可拖拽 |
 
 #### 目录结构
 
 ```
-src/renderer/
-├── components/
-│   ├── editor/         # CodeMirror 编辑器组件
-│   ├── file-tree/      # 文件树组件
-│   ├── layout/         # 主布局组件 (MainLayout, Toolbar, StatusBar)
-│   └── preview/        # Markdown 预览组件
-├── hooks/              # 自定义 Hooks
-├── stores/             # Zustand 状态管理
-├── styles/             # 全局样式
-├── utils/              # Markdown 处理工具
-├── App.tsx             # 根组件
-├── index.html          # HTML 模板
-└── main.tsx            # React 入口
+MainLayout
+├── Toolbar (工具栏)
+├── editor-container
+│   ├── sidebar (可选)
+│   ├── editor-pane (编辑器)
+│   ├── resizer (分割线)
+│   └── preview-pane (预览)
+└── StatusBar (状态栏)
 ```
 
 #### 验收标准
 
-- [x] Vite 构建正常
-- [x] React 应用可启动
-- [x] 主题变量定义完整
+- [x] 布局正确显示
+- [x] 编辑区正常
+- [x] 预览区正常
+- [x] 拖动功能正常
 
 ---
 
-## 阶段二：核心功能 (P1)
+### P1-4: Markdown 预览渲染 ✅
 
-### P1-1: CodeMirror 编辑器集成 ⬜
+**执行角色**: FE (前端开发工程师)
+**状态**: ✅ 已完成并验收
 
-**计划执行时间**: 2026-05-12
-**执行角色**: FE
-**状态**: ⬜ 待执行
+#### 任务清单
 
-#### 计划任务
+| 任务 ID | 任务名称 | 状态 | 验收结果 |
+|---------|---------|------|---------|
+| P1-4.1 | 安装 unified 依赖 | ✅ | 依赖已安装 |
+| P1-4.2 | 创建 markdown.ts 工具 | ✅ | unified 处理链完成 |
+| P1-4.3 | 配置 remark/rehype 插件 | ✅ | GFM、数学公式支持 |
+| P1-4.4 | 实现防抖渲染 | ✅ | 300ms 防抖生效 |
+| P1-4.5 | 配置代码高亮 | ✅ | highlight.js 集成 |
 
-| 任务 ID | 任务名称 | 优先级 | 工时 | 依赖 |
-|---------|---------|--------|------|------|
-| P1-1.1 | 安装依赖 | P0 | 1h | M0-7 |
-| P1-1.2 | 编辑器组件 | P0 | 4h | P1-1.1 |
-| P1-1.3 | Markdown 语法 | P0 | 4h | P1-1.2 |
-| P1-1.4 | 编辑器主题 | P1 | 2h | P1-1.2 |
+#### 核心实现
+
+```typescript
+// apps/markdown-editor/src/renderer/utils/markdown.ts
+const processor = unified()
+  .use(remarkParse)
+  .use(remarkMath)           // 数学公式
+  .use(remarkGfm)            // GFM 支持
+  .use(remarkRehype)
+  .use(rehypeKatex)          // KaTeX 渲染
+  .use(rehypeHighlight)       // 代码高亮
+  .use(rehypeSanitize)       // XSS 防护
+  .use(rehypeStringify);
+
+export async function renderMarkdown(content: string): Promise<string> {
+  const result = await processor.process(content);
+  return DOMPurify.sanitize(String(result));
+}
+```
+
+#### Preview 组件
+
+```typescript
+// apps/markdown-editor/src/renderer/components/preview/Preview.tsx
+export function Preview(): React.JSX.Element {
+  const { content } = useEditorStore();
+  const debouncedContent = useDebounce(content, 300);
+  const [html, setHtml] = useState('');
+
+  useEffect(() => {
+    renderMarkdown(debouncedContent).then(setHtml);
+  }, [debouncedContent]);
+
+  return <div className="preview" dangerouslySetInnerHTML={{ __html: html }} />;
+}
+```
 
 #### 验收标准
 
-- [ ] CodeMirror 编辑器正常显示
-- [ ] Markdown 语法高亮正确
-- [ ] 主题切换正常
+- [x] Markdown 解析正确
+- [x] GFM 支持正确
+- [x] 数学公式正确
+- [x] 代码高亮正确
+- [x] 300ms 防抖生效
 
 ---
 
-### P1-2: 编辑器状态管理 ⬜
+### P1-5: 工具栏组件 ✅
 
-**计划执行时间**: 2026-05-12
-**执行角色**: FE
-**状态**: ⬜ 待执行
+**执行角色**: FE (前端开发工程师)
+**状态**: ✅ 已完成并验收
 
-#### 计划任务
+#### 任务清单
 
-| 任务 ID | 任务名称 | 优先级 | 工时 | 依赖 |
-|---------|---------|--------|------|------|
-| P1-2.1 | Zustand store | P0 | 2h | M0-4 |
-| P1-2.2 | 状态持久化 | P1 | 2h | P1-2.1 |
+| 任务 ID | 任务名称 | 状态 | 验收结果 |
+|---------|---------|------|---------|
+| P1-5.1 | 创建 Toolbar 组件 | ✅ | 工具栏显示正常 |
+| P1-5.2 | 实现格式按钮 | ✅ | 11 个格式按钮实现 |
+| P1-5.3 | 实现文件操作按钮 | ✅ | 打开/保存/另存为 |
+| P1-5.4 | 实现主题切换按钮 | ✅ | 主题切换正常 |
+
+#### 工具栏功能
+
+| 按钮 | 快捷键 | 功能 |
+|------|--------|------|
+| Bold | Ctrl+B | 粗体 |
+| Italic | Ctrl+I | 斜体 |
+| Code | Ctrl+K | 行内代码 |
+| Heading1 | Ctrl+1 | 标题1 |
+| List | Ctrl+Shift+U | 无序列表 |
+| OrderedList | Ctrl+Shift+O | 有序列表 |
+| Quote | Ctrl+Shift+] | 引用 |
+| CodeBlock | Ctrl+Shift+K | 代码块 |
+| Link | Ctrl+L | 链接 |
+| Image | Ctrl+Shift+I | 图片 |
+| HR | Ctrl+Shift+H | 分割线 |
+
+#### 验收标准
+
+- [x] 工具栏显示正常
+- [x] 加粗、斜体等功能正常
+- [x] 打开、保存按钮正常
+- [x] 主题切换正常
 
 ---
 
-### P1-3: 双栏布局组件 ⬜
+### P1-6: 快捷键系统 ✅
 
-**计划执行时间**: 2026-05-12
-**执行角色**: FE
-**状态**: ⬜ 待执行
+**执行角色**: FE (前端开发工程师)
+**状态**: ✅ 已完成并验收
 
-#### 计划任务
+#### 任务清单
 
-| 任务 ID | 任务名称 | 优先级 | 工时 | 依赖 |
-|---------|---------|--------|------|------|
-| P1-3.1 | MainLayout | P0 | 2h | M0-7 |
-| P1-3.2 | 可拖拽分割线 | P0 | 3h | P1-3.1 |
+| 任务 ID | 任务名称 | 状态 | 验收结果 |
+|---------|---------|------|---------|
+| P1-6.1 | 创建 useShortcuts hook | ✅ | 快捷键监听正常 |
+| P1-6.2 | 实现格式快捷键 | ✅ | Ctrl+B/I/K 等 |
+| P1-6.3 | 实现文件操作快捷键 | ✅ | Ctrl+S/O 正常 |
+| P1-6.4 | 实现预览开关快捷键 | ✅ | Ctrl+Shift+P 正常 |
+
+#### 快捷键列表
+
+```typescript
+const shortcuts = [
+  { key: 'ctrl+b', action: 'bold' },
+  { key: 'ctrl+i', action: 'italic' },
+  { key: 'ctrl+k', action: 'code' },
+  { key: 'ctrl+s', action: 'save' },
+  { key: 'ctrl+o', action: 'open' },
+  { key: 'ctrl+shift+s', action: 'saveAs' },
+  { key: 'ctrl+shift+p', action: 'togglePreview' },
+  // ...
+];
+```
+
+#### 验收标准
+
+- [x] 快捷键监听正常
+- [x] Ctrl+B/I/K 正常
+- [x] Ctrl+S/O 正常
+- [x] Ctrl+Shift+P 正常
 
 ---
 
-### P1-4: Markdown 预览渲染 ⬜
+### P1-7: UI 状态管理 ✅
 
-**计划执行时间**: 2026-05-12
-**执行角色**: FE
-**状态**: ⬜ 待执行
+**执行角色**: FE (前端开发工程师)
+**状态**: ✅ 已完成并验收
 
-#### 计划任务
+#### 任务清单
 
-| 任务 ID | 任务名称 | 优先级 | 工时 | 依赖 |
-|---------|---------|--------|------|------|
-| P1-4.1 | unified 处理链 | P0 | 3h | M0-4 |
-| P1-4.2 | GFM 支持 | P1 | 2h | P1-4.1 |
-| P1-4.3 | 数学公式 | P1 | 2h | P1-4.1 |
+| 任务 ID | 任务名称 | 状态 | 验收结果 |
+|---------|---------|------|---------|
+| P1-7.1 | 创建 uiStore | ✅ | UI 状态管理正常 |
+| P1-7.2 | 实现预览面板开关 | ✅ | 预览切换正常 |
+| P1-7.3 | 实现分栏比例保存 | ✅ | 比例持久化 |
+| P1-7.4 | 实现主题持久化 | ✅ | 主题状态持久化 |
+
+#### 核心实现
+
+```typescript
+// apps/markdown-editor/src/renderer/stores/uiStore.ts
+export const useUIStore = create<UIState>()(
+  persist(
+    (set, get) => ({
+      previewVisible: true,
+      splitRatio: 50,
+      sidebarVisible: true,
+      theme: 'light',
+
+      togglePreview: () => set({ previewVisible: !get().previewVisible }),
+      setSplitRatio: (ratio) => set({ splitRatio: Math.max(20, Math.min(80, ratio)) }),
+      toggleTheme: () => {
+        const newTheme = get().theme === 'light' ? 'dark' : 'light';
+        set({ theme: newTheme });
+        document.documentElement.setAttribute('data-theme', newTheme);
+      },
+    }),
+    { name: 'ui-storage' }
+  )
+);
+```
+
+#### 验收标准
+
+- [x] UI 状态管理正常
+- [x] 预览切换正常
+- [x] 比例持久化
+- [x] 主题状态持久化
+
+---
+
+### P1-8: 状态栏组件 ✅
+
+**执行角色**: FE (前端开发工程师)
+**状态**: ✅ 已完成并验收
+
+#### 任务清单
+
+| 任务 ID | 任务名称 | 状态 | 验收结果 |
+|---------|---------|------|---------|
+| P1-8.1 | 创建 StatusBar 组件 | ✅ | 状态栏显示正常 |
+| P1-8.2 | 显示文件信息 | ✅ | 文件名显示正确 |
+| P1-8.3 | 显示统计信息 | ✅ | 字数、行数显示正确 |
+
+#### 状态栏信息
+
+| 区域 | 内容 |
+|------|------|
+| 左 | 文件名、修改指示器 (*)、字数、行数 |
+| 右 | 编码、主题、版本号 |
+
+#### 验收标准
+
+- [x] 状态栏显示正常
+- [x] 文件名显示正确
+- [x] 字数、行数显示正确
+
+---
+
+### P1-9: 主进程文件操作 ✅
+
+**执行角色**: BE (Electron 开发工程师)
+**状态**: ✅ 已完成并验收
+
+#### 任务清单
+
+| 任务 ID | 任务名称 | 状态 | 验收结果 |
+|---------|---------|------|---------|
+| P1-9.1 | 实现文件对话框 | ✅ | 对话框正常打开 |
+| P1-9.2 | 实现文件读取 | ✅ | 文件内容读取正确 |
+| P1-9.3 | 实现文件保存 | ✅ | 文件保存正常 |
+| P1-9.4 | 实现编码检测 | ✅ | GBK/UTF-8 检测正确 |
+
+#### IPC 通道
+
+| 通道 | 说明 |
+|------|------|
+| files:open | 打开文件对话框并读取内容 |
+| files:save | 保存到指定路径 |
+| files:saveAs | 另存为对话框 |
+| files:readDirectory | 读取目录结构 |
+
+#### 验收标准
+
+- [x] 对话框正常打开
+- [x] 文件内容读取正确
+- [x] 文件保存正常
+- [x] GBK/UTF-8 检测正确
+
+---
+
+### P1-10: 文件状态管理 ✅
+
+**执行角色**: FE (前端开发工程师)
+**状态**: ✅ 已完成并验收
+
+#### 任务清单
+
+| 任务 ID | 任务名称 | 状态 | 验收结果 |
+|---------|---------|------|---------|
+| P1-10.1 | 创建 fileStore | ✅ | 文件状态管理正常 |
+| P1-10.2 | 实现打开文件 | ✅ | 文件打开正常 |
+| P1-10.3 | 实现保存文件 | ✅ | 文件保存正常 |
+| P1-10.4 | 实现最近文件列表 | ✅ | 最近文件显示正确 |
+
+#### 核心功能
+
+```typescript
+// apps/markdown-editor/src/renderer/stores/fileStore.ts
+interface FileStore {
+  currentFile: FileState | null;
+  fileTree: FileTreeItem[];
+  recentFiles: RecentFile[];
+
+  openFile: () => Promise<void>;
+  saveFile: () => Promise<void>;
+  saveAsFile: () => Promise<void>;
+  loadDirectory: (path: string) => Promise<void>;
+  addRecentFile: (file: Omit<RecentFile, 'lastOpened'>) => void;
+}
+```
+
+#### 验收标准
+
+- [x] 文件状态管理正常
+- [x] 文件打开正常
+- [x] 文件保存正常
+- [x] 最近文件显示正确
 
 ---
 
@@ -373,41 +459,46 @@ src/renderer/
 
 | 阶段 | 任务数 | 完成数 | 完成率 |
 |------|--------|--------|--------|
-| M0-1 | 3 | 3 | 100% |
-| M0-2 | 4 | 4 | 100% |
-| M0-3 | 3 | 3 | 100% |
-| M0-4 | 3 | 3 | 100% |
-| M0-5 | 6 | 6 | 100% |
-| M0-6 | 3 | 3 | 100% |
-| M0-7 | 4 | 4 | 100% |
-| **M0 总计** | **26** | **26** | **100%** |
+| M0-1 ~ M0-7 | 26 | 26 | 100% |
+| P1-1 ~ P1-10 | 36 | 36 | 100% |
+| **总计** | **62** | **62** | **100%** |
 
-### 待执行任务
+### 功能覆盖率
 
-| 阶段 | 任务数 | 状态 |
-|------|--------|------|
-| P1-1 ~ P1-10 | ~30 | ⬜ 待执行 |
-| P2 ~ P4 | ~20 | ⬜ 待规划 |
+| 功能模块 | 状态 | 说明 |
+|----------|------|------|
+| 编辑器 | ✅ | CodeMirror 6 + Markdown |
+| 预览 | ✅ | unified 处理链 |
+| 文件操作 | ✅ | 打开/保存/另存为 |
+| 工具栏 | ✅ | 格式化按钮 |
+| 快捷键 | ✅ | 常用快捷键 |
+| 主题 | ✅ | 明暗主题切换 |
+| 状态栏 | ✅ | 统计信息 |
 
 ---
 
 ## 下一步计划
 
-### 立即行动 (P1 阶段)
+### 阶段三：增强功能 (P2)
 
-1. **P1-1: CodeMirror 编辑器** - 实现编辑器组件
-2. **P1-2: 编辑器状态管理** - 实现 Zustand store
-3. **P1-3: 双栏布局** - 实现主布局组件
-4. **P1-4: Markdown 预览** - 实现 unified 处理链
+| 任务 ID | 任务名称 | 优先级 | 依赖 |
+|---------|---------|--------|------|
+| P2-1 | 目录树组件 | P0 | P1-10 |
+| P2-2 | 自动目录生成 | P0 | P1-4 |
+| P2-3 | 滚动同步 | P0 | P1-3 |
+| P2-4 | KaTeX 数学公式 | P1 | P1-4 |
+| P2-5 | Mermaid 图表 | P1 | P1-4 |
+| P2-6 | HTML 导出 | P0 | P1-9 |
+| P2-7 | PDF 导出 | P1 | P2-6 |
 
-### 短期目标 (P1 阶段)
+### P2 阶段主要目标
 
-1. P1-5: 工具栏组件
-2. P1-6: 快捷键系统
-3. P1-7: UI 状态管理
-4. P1-8: 状态栏组件
-5. P1-9: 主进程文件操作完善
-6. P1-10: 文件状态管理完善
+1. **目录树组件** - 文件浏览功能
+2. **自动目录生成** - 标题导航 TOC
+3. **滚动同步** - 编辑器和预览同步滚动
+4. **KaTeX 增强** - 数学公式完善
+5. **Mermaid 图表** - 流程图、时序图支持
+6. **导出功能** - HTML 和 PDF 导出
 
 ---
 
@@ -417,9 +508,9 @@ src/renderer/
 
 | 风险 | 影响 | 应对措施 |
 |------|------|----------|
-| 依赖版本兼容性 | 中 | 锁定版本，使用 pnpm workspace |
-| 跨平台差异 | 低 | 使用跨平台 API，避免平台特定代码 |
-| CodeMirror 与 React 19 兼容性 | 中 | 持续关注官方更新 |
+| CodeMirror 与 React 19 兼容性 | 中 | 已验证兼容性 |
+| 大文件性能 | 中 | P3 阶段虚拟滚动优化 |
+| 跨平台差异 | 低 | 使用跨平台 API |
 
 ---
 
@@ -444,28 +535,20 @@ pnpm lint
 pnpm build
 ```
 
-### B. 目录结构
+### B. 技术栈
 
-```
-/workspace/
-├── apps/
-│   └── markdown-editor/    # Electron 主应用
-│       └── src/
-│           ├── main/      # Electron 主进程
-│           ├── preload/    # Preload 桥接层
-│           └── renderer/   # React 渲染进程
-├── packages/
-│   ├── shared/           # 共享类型和工具
-│   ├── tsconfig/         # TypeScript 配置
-│   └── eslint-config/    # ESLint 配置
-├── docs/                 # 项目文档
-├── package.json          # 根配置
-├── turbo.json            # Turborepo 配置
-└── pnpm-workspace.yaml   # pnpm workspace 配置
-```
+| 类别 | 技术 | 版本 |
+|------|------|------|
+| 桌面框架 | Electron | ^41.0.0 |
+| 前端框架 | React | ^19.0.0 |
+| 类型系统 | TypeScript | ^6.0.0 |
+| 编辑器 | CodeMirror | ^6.0.0 |
+| 状态管理 | Zustand | ^4.0.0 |
+| Markdown | unified/remark/rehype | ^11.0.0 |
+| 构建工具 | Turborepo + pnpm | - |
 
 ---
 
-**文档状态**: ✅ M0 阶段全部完成 (7/7 任务)
+**文档状态**: ✅ P1 阶段全部完成 (10/10 任务)
 **最后更新**: 2026-05-11
 **更新人**: 胡宇峰
