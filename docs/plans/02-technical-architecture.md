@@ -4,9 +4,12 @@
 
 | 项目 | 内容 |
 |------|------|
-| 文档版本 | v1.0.0 |
+| 文档版本 | v1.1.0 |
 | 创建日期 | 2026-05-11 |
-| 架构师 | - |
+| 更新日期 | 2026-05-11 |
+| 架构师 | 胡宇峰 |
+| 开发者 | 胡宇峰 |
+| 联系邮箱 | hyf2k@163.com |
 | 审核状态 | 待审核 |
 
 ---
@@ -311,6 +314,86 @@ Rendered HTML
 | rehype-sanitize | HTML 净化 | rehype-sanitize |
 | rehype-stringify | HTML 生成 | rehype-stringify |
 
+**预览面板开关设计**：
+
+预览面板开关功能允许用户动态控制预览区的显示和隐藏，提供更灵活的编辑体验。
+
+```typescript
+// stores/uiStore.ts
+interface UIState {
+  previewVisible: boolean;
+  splitRatio: number;
+  
+  togglePreview: () => void;
+  setPreviewVisible: (visible: boolean) => void;
+  setSplitRatio: (ratio: number) => void;
+}
+
+export const useUIStore = create<UIState>()(
+  persist(
+    (set, get) => ({
+      previewVisible: true,
+      splitRatio: 50,
+
+      togglePreview: () => {
+        set({ previewVisible: !get().previewVisible });
+      },
+
+      setPreviewVisible: (visible) => {
+        set({ previewVisible: visible });
+      },
+
+      setSplitRatio: (ratio) => {
+        set({ splitRatio: ratio });
+      },
+    }),
+    {
+      name: 'ui-storage',
+    }
+  )
+);
+```
+
+**布局组件设计**：
+
+```tsx
+// components/layout/MainLayout.tsx
+import { useUIStore } from '../../stores/uiStore';
+
+export function MainLayout(): JSX.Element {
+  const { previewVisible, splitRatio } = useUIStore();
+
+  return (
+    <div className="main-layout">
+      <Toolbar />
+      <div className="editor-container">
+        <div 
+          className="editor-pane" 
+          style={{ 
+            flex: previewVisible ? splitRatio : 1,
+            transition: 'flex 0.2s ease'
+          }}
+        >
+          <Editor />
+        </div>
+        {previewVisible && (
+          <>
+            <div className="resizer" />
+            <div 
+              className="preview-pane" 
+              style={{ flex: 100 - splitRatio }}
+            >
+              <Preview />
+            </div>
+          </>
+        )}
+      </div>
+      <StatusBar />
+    </div>
+  );
+}
+```
+
 #### 3.2.3 文件管理模块 (File Manager)
 
 **职责**：管理文件操作和目录树
@@ -430,9 +513,9 @@ async function readFileWithEncoding(filePath: string): Promise<{ content: string
 │  │ editorStore  │  │  fileStore   │  │    uiStore       │  │
 │  │              │  │              │  │                  │  │
 │  │ - content    │  │ - currentFile│  │ - sidebarVisible │  │
-│  │ - cursorPos  │  │ - fileTree   │  │ - activePanel    │  │
-│  │ - isDirty    │  │ - recentFiles│  │ - theme          │  │
-│  │ - selection  │  │ - isLoading  │  │ - layout         │  │
+│  │ - cursorPos  │  │ - fileTree   │  │ - previewVisible │  │
+│  │ - isDirty    │  │ - recentFiles│  │ - splitRatio     │  │
+│  │ - selection  │  │ - isLoading  │  │ - theme          │  │
 │  └──────────────┘  └──────────────┘  └──────────────────┘  │
 │                                                             │
 │  ┌──────────────────────────────────────────────────────┐  │
@@ -490,6 +573,24 @@ DOMPurify 净化 HTML
 KaTeX 渲染数学公式
 Mermaid 渲染图表
 highlight.js 高亮代码
+```
+
+#### 4.2.3 预览面板开关流程
+
+```
+用户点击预览开关按钮或按 Ctrl+Shift+P
+    ↓
+Toolbar 调用 uiStore.togglePreview()
+    ↓
+uiStore 更新 previewVisible 状态
+    ↓
+状态持久化到 localStorage
+    ↓
+MainLayout 组件响应状态变化
+    ↓
+预览面板显示/隐藏（带过渡动画）
+    ↓
+编辑区自动调整宽度
 ```
 
 ---
@@ -798,4 +899,5 @@ export function measureRenderTime(componentName: string) {
 
 | 版本 | 日期 | 修改内容 | 作者 |
 |------|------|---------|------|
-| v1.0.0 | 2026-05-11 | 初始版本 | - |
+| v1.0.0 | 2026-05-11 | 初始版本 | 胡宇峰 |
+| v1.1.0 | 2026-05-11 | 增加预览面板开关功能设计 | 胡宇峰 |

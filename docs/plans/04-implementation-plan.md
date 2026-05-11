@@ -4,10 +4,13 @@
 
 | 项目 | 内容 |
 |------|------|
-| 文档版本 | v1.0.0 |
+| 文档版本 | v1.1.0 |
 | 创建日期 | 2026-05-11 |
+| 更新日期 | 2026-05-11 |
 | 计划周期 | 15 周 |
-| 负责人 | - |
+| 负责人 | 胡宇峰 |
+| 开发者 | 胡宇峰 |
+| 联系邮箱 | hyf2k@163.com |
 
 ---
 
@@ -653,7 +656,142 @@
 
 ---
 
-#### 任务 P1-4: 实现文件操作
+#### 任务 P1-4: 实现预览面板开关
+
+**负责人**：前端开发  
+**工时**：8 小时  
+**依赖**：P1-2
+
+**详细步骤**：
+
+1. **创建 UI 状态管理**
+   ```typescript
+   // src/renderer/stores/uiStore.ts
+   import { create } from 'zustand';
+   import { persist } from 'zustand/middleware';
+
+   interface UIState {
+     previewVisible: boolean;
+     splitRatio: number;
+     
+     togglePreview: () => void;
+     setPreviewVisible: (visible: boolean) => void;
+     setSplitRatio: (ratio: number) => void;
+   }
+
+   export const useUIStore = create<UIState>()(
+     persist(
+       (set, get) => ({
+         previewVisible: true,
+         splitRatio: 50,
+
+         togglePreview: () => {
+           set({ previewVisible: !get().previewVisible });
+         },
+
+         setPreviewVisible: (visible) => {
+           set({ previewVisible: visible });
+         },
+
+         setSplitRatio: (ratio) => {
+           set({ splitRatio: ratio });
+         },
+       }),
+       {
+         name: 'ui-storage',
+       }
+     )
+   );
+   ```
+
+2. **更新主布局组件**
+   ```tsx
+   // src/renderer/components/layout/MainLayout.tsx
+   import React from 'react';
+   import { Editor } from '../editor/Editor';
+   import { Preview } from '../preview/Preview';
+   import { Toolbar } from './Toolbar';
+   import { StatusBar } from './StatusBar';
+   import { useUIStore } from '../../stores/uiStore';
+   import './MainLayout.css';
+
+   export function MainLayout(): JSX.Element {
+     const { previewVisible, splitRatio } = useUIStore();
+
+     return (
+       <div className="main-layout">
+         <Toolbar />
+         <div className="editor-container">
+           <div 
+             className="editor-pane" 
+             style={{ 
+               flex: previewVisible ? splitRatio : 1,
+               transition: 'flex 0.2s ease'
+             }}
+           >
+             <Editor />
+           </div>
+           {previewVisible && (
+             <>
+               <div className="resizer" />
+               <div 
+                 className="preview-pane" 
+                 style={{ flex: 100 - splitRatio }}
+               >
+                 <Preview />
+               </div>
+             </>
+           )}
+         </div>
+         <StatusBar />
+       </div>
+     );
+   }
+   ```
+
+3. **添加工具栏按钮**
+   ```tsx
+   // 在 Toolbar.tsx 中添加
+   import { useUIStore } from '../../stores/uiStore';
+
+   export function Toolbar(): JSX.Element {
+     const { previewVisible, togglePreview } = useUIStore();
+
+     return (
+       <div className="toolbar">
+         <button 
+           onClick={togglePreview}
+           title={`预览面板 (${previewVisible ? '已开启' : '已关闭'}) - Ctrl+Shift+P`}
+         >
+           {previewVisible ? '👁️ 隐藏预览' : '👁️‍🗨️ 显示预览'}
+         </button>
+         {/* 其他按钮 */}
+       </div>
+     );
+   }
+   ```
+
+4. **添加快捷键支持**
+   ```typescript
+   // 在 useShortcuts.ts 中添加
+   { key: 'Ctrl+Shift+P', action: 'togglePreview' },
+
+   // 在 handleKeyDown 中添加
+   case 'togglePreview':
+     useUIStore.getState().togglePreview();
+     break;
+   ```
+
+**验收标准**：
+- [ ] 预览面板可通过按钮切换
+- [ ] 快捷键 Ctrl+Shift+P 正常工作
+- [ ] 切换有平滑过渡动画
+- [ ] 状态持久化保存
+- [ ] 编辑区自动扩展
+
+---
+
+#### 任务 P1-5: 实现文件操作
 
 **负责人**：Electron 开发  
 **工时**：16 小时  
@@ -972,6 +1110,7 @@
 | CodeMirror 集成完成 | ⬜ | 编辑器可输入 |
 | 双栏布局完成 | ⬜ | 左右分栏显示 |
 | 实时预览完成 | ⬜ | 输入同步预览 |
+| 预览面板开关完成 | ⬜ | 预览可切换显示/隐藏 |
 | 文件操作完成 | ⬜ | 打开/保存文件 |
 | 工具栏完成 | ⬜ | 按钮功能正常 |
 | 快捷键完成 | ⬜ | 快捷键响应 |
@@ -1634,4 +1773,5 @@ pnpm typecheck
 
 | 版本 | 日期 | 修改内容 | 作者 |
 |------|------|---------|------|
-| v1.0.0 | 2026-05-11 | 初始版本 | - |
+| v1.0.0 | 2026-05-11 | 初始版本 | 胡宇峰 |
+| v1.1.0 | 2026-05-11 | 增加预览面板开关功能任务 | 胡宇峰 |

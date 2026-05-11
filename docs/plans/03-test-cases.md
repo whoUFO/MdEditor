@@ -4,9 +4,12 @@
 
 | 项目 | 内容 |
 |------|------|
-| 文档版本 | v1.0.0 |
+| 文档版本 | v1.1.0 |
 | 创建日期 | 2026-05-11 |
-| 测试负责人 | - |
+| 更新日期 | 2026-05-11 |
+| 测试负责人 | 胡宇峰 |
+| 开发者 | 胡宇峰 |
+| 联系邮箱 | hyf2k@163.com |
 | 审核状态 | 待审核 |
 
 ---
@@ -98,6 +101,87 @@ describe('Markdown Parser', () => {
     expect(result).toContain('<ul>');
     expect(result).toContain('<li>项目1</li>');
     expect(result).toContain('<li>项目2</li>');
+  });
+});
+```
+
+---
+
+#### TC-INT-005: 预览面板开关
+
+| 项目 | 内容 |
+|------|------|
+| **测试目的** | 验证预览面板开关功能正常工作 |
+
+**自动化代码**：
+```typescript
+test.describe('Preview Panel Toggle', () => {
+  test('should toggle preview panel via button', async ({ page }) => {
+    await page.goto('index.html');
+
+    // 验证预览面板初始可见
+    await expect(page.locator('.preview-pane')).toBeVisible();
+
+    // 点击预览开关按钮
+    await page.click('[data-testid="toggle-preview-btn"]');
+
+    // 验证预览面板隐藏
+    await expect(page.locator('.preview-pane')).not.toBeVisible();
+
+    // 再次点击
+    await page.click('[data-testid="toggle-preview-btn"]');
+
+    // 验证预览面板重新显示
+    await expect(page.locator('.preview-pane')).toBeVisible();
+  });
+
+  test('should toggle preview panel via shortcut', async ({ page }) => {
+    await page.goto('index.html');
+
+    // 使用快捷键 Ctrl+Shift+P
+    await page.keyboard.press('Control+Shift+P');
+
+    // 验证预览面板隐藏
+    await expect(page.locator('.preview-pane')).not.toBeVisible();
+
+    // 再次使用快捷键
+    await page.keyboard.press('Control+Shift+P');
+
+    // 验证预览面板重新显示
+    await expect(page.locator('.preview-pane')).toBeVisible();
+  });
+
+  test('should persist preview visibility state', async ({ page }) => {
+    await page.goto('index.html');
+
+    // 隐藏预览面板
+    await page.click('[data-testid="toggle-preview-btn"]');
+
+    // 刷新页面
+    await page.reload();
+
+    // 验证预览面板保持隐藏状态
+    await expect(page.locator('.preview-pane')).not.toBeVisible();
+  });
+
+  test('should expand editor when preview hidden', async ({ page }) => {
+    await page.goto('index.html');
+
+    // 获取编辑器初始宽度
+    const initialWidth = await page.locator('.editor-pane').evaluate((el) => {
+      return el.getBoundingClientRect().width;
+    });
+
+    // 隐藏预览面板
+    await page.click('[data-testid="toggle-preview-btn"]');
+
+    // 获取编辑器新宽度
+    const newWidth = await page.locator('.editor-pane').evaluate((el) => {
+      return el.getBoundingClientRect().width;
+    });
+
+    // 验证编辑器宽度增加
+    expect(newWidth).toBeGreaterThan(initialWidth);
   });
 });
 ```
@@ -1201,4 +1285,5 @@ graph TD
 
 | 版本 | 日期 | 修改内容 | 作者 |
 |------|------|---------|------|
-| v1.0.0 | 2026-05-11 | 初始版本 | - |
+| v1.0.0 | 2026-05-11 | 初始版本 | 胡宇峰 |
+| v1.1.0 | 2026-05-11 | 增加预览面板开关测试用例 | 胡宇峰 |
