@@ -14,7 +14,108 @@
 
 ## 1. 任务管理概述
 
-### 1.1 项目阶段划分
+### 1.1 团队成员与角色
+
+| 角色简称 | 角色全称 | 人员姓名 | 职责范围 | 联系方式 |
+|---------|---------|---------|---------|---------|
+| **FE** | 前端开发工程师 | 张三 (ZhangSan) | React 组件、状态管理、UI 交互 | zhangsan@example.com |
+| **BE** | Electron 开发工程师 | 李四 (LiSi) | 主进程、IPC、系统集成、打包 | lisi@example.com |
+| **QA** | 测试工程师 | 王五 (WangWu) | 测试用例、自动化测试、质量保障 | wangwu@example.com |
+| **PM** | 项目经理 | **胡宇峰** (HuYufeng) | 任务分配、进度跟踪、文档编写 | hyf2k@163.com |
+
+### 1.2 Subagent 角色定义
+
+为提高团队协作效率，我们为每个角色创建了专门的 Subagent。以下是各角色 Subagent 的职责和配置：
+
+#### 🔵 FE-Agent - 前端开发 Subagent
+
+```
+角色名称: FE-Agent (前端开发助手)
+负责人员: 张三 (ZhangSan)
+职责范围:
+  - React 组件开发
+  - 状态管理 (Zustand)
+  - UI/UX 交互实现
+  - CSS 样式编写
+  - Markdown 预览渲染
+
+技能专长:
+  - React 19
+  - TypeScript 6
+  - CSS Modules + CSS Variables
+  - CodeMirror 6
+  - unified/remark/rehype
+
+工作目录: /workspace/apps/markdown-editor/src/renderer
+```
+
+#### 🟢 BE-Agent - Electron 开发 Subagent
+
+```
+角色名称: BE-Agent (Electron 开发助手)
+负责人员: 李四 (LiSi)
+职责范围:
+  - Electron 主进程开发
+  - IPC 通信处理
+  - Preload 桥接层
+  - 系统集成 (菜单、对话框)
+  - 应用打包发布
+
+技能专长:
+  - Electron 41
+  - Node.js
+  - Electron Builder
+  - 文件系统操作
+  - 安全策略配置
+
+工作目录: /workspace/apps/markdown-editor/src/main
+```
+
+#### 🟡 QA-Agent - 测试工程师 Subagent
+
+```
+角色名称: QA-Agent (测试工程师助手)
+负责人员: 王五 (WangWu)
+职责范围:
+  - 测试用例编写
+  - 自动化测试实现
+  - 性能测试
+  - 安全测试
+  - 质量报告
+
+技能专长:
+  - Playwright
+  - Vitest
+  - 性能分析
+  - 安全审计
+  - CI/CD 集成
+
+工作目录: /workspace/tests
+```
+
+#### 🔴 PM-Agent - 项目经理 Subagent
+
+```
+角色名称: PM-Agent (项目经理助手)
+负责人员: 胡宇峰 (HuYufeng)
+职责范围:
+  - 任务分配与跟踪
+  - 进度管理
+  - 文档编写
+  - 团队协调
+  - 风险管理
+
+技能专长:
+  - 项目管理
+  - 文档编写
+  - 需求分析
+  - 敏捷开发
+  - 沟通协调
+
+工作目录: /workspace/docs
+```
+
+### 1.3 项目阶段划分
 
 | 阶段 | 周期 | 主要目标 | 关键交付物 |
 |------|------|---------|-----------|
@@ -24,16 +125,16 @@
 | P3 - 安全与优化 | 第 11-13 周 | 性能优化和安全 | 高性能、安全的编辑器 |
 | P4 - 发布准备 | 第 14-15 周 | 文档和打包 | v0.1.0 正式版本 |
 
-### 1.2 团队角色定义
+### 1.4 团队角色定义
 
 | 角色 | 职责范围 | 所需技能 |
 |------|---------|---------|
-| **FE - 前端开发** | React 组件、状态管理、UI 交互 | React, TypeScript, CSS |
-| **BE - Electron 开发** | 主进程、IPC、系统集成、打包 | Electron, Node.js, Electron Builder |
-| **QA - 测试工程师** | 测试用例、自动化测试、质量保障 | Playwright, Vitest |
-| **PM - 项目经理** | 任务分配、进度跟踪、文档编写 | 项目管理、文档 |
+| **FE** | React 组件、状态管理、UI 交互 | React, TypeScript, CSS |
+| **BE** | 主进程、IPC、系统集成、打包 | Electron, Node.js, Electron Builder |
+| **QA** | 测试用例、自动化测试、质量保障 | Playwright, Vitest |
+| **PM** | 任务分配、进度跟踪、文档编写 | 项目管理、文档 |
 
-### 1.3 任务优先级定义
+### 1.5 任务优先级定义
 
 | 优先级 | 说明 | 响应时间 |
 |--------|------|----------|
