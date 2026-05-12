@@ -18,6 +18,7 @@ const electronAPI: ElectronAPI = {
     getVersion: () => ipcRenderer.invoke('app:getVersion'),
     getPlatform: () => ipcRenderer.invoke('app:getPlatform'),
   },
+  printToPDF: () => ipcRenderer.invoke('print:pdf'),
 };
 
 contextBridge.exposeInMainWorld('electronAPI', electronAPI);

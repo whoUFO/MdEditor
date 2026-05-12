@@ -6,10 +6,17 @@ import { EditorSelection } from '@codemirror/state';
 import { useEditorStore } from '../../stores/editorStore';
 import './Editor.css';
 
+let editorScrollHandler: ((scrollTop: number) => void) | null = null;
+
+export function setEditorScrollHandler(handler: (scrollTop: number) => void) {
+  editorScrollHandler = handler;
+}
+
 export function Editor(): React.JSX.Element {
   const editorRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
   const { content, setContent, setCursorPosition, setSelection } = useEditorStore();
+  const isSyncingRef = useRef(false);
 
   useEffect(() => {
     if (!editorRef.current) return;
@@ -47,8 +54,32 @@ export function Editor(): React.JSX.Element {
 
     viewRef.current = view;
 
+    const scrollEl = view.scrollDOM;
+    if (scrollEl) {
+      scrollEl.addEventListener('scroll', () => {
+        if (!isSyncingRef.current && editorScrollHandler) {
+          const scrollHeight = scrollEl.scrollHeight - scrollEl.clientHeight;
+          const scrollPercent = scrollHeight > 0 ? scrollEl.scrollTop / scrollHeight : 0;
+          editorScrollHandler(scrollPercent);
+        }
+      });
+    }
+
+    (window as any).syncEditorScroll = (percent: number) => {
+      isSyncingRef.current = true;
+      const scrollEl = view.scrollDOM;
+      if (scrollEl) {
+        const scrollHeight = scrollEl.scrollHeight - scrollEl.clientHeight;
+        scrollEl.scrollTop = percent * scrollHeight;
+      }
+      setTimeout(() => {
+        isSyncingRef.current = false;
+      }, 50);
+    };
+
     return () => {
       view.destroy();
+      (window as any).syncEditorScroll = undefined;
     };
   }, []);
 
