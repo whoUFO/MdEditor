@@ -1,0 +1,38 @@
+.status-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-xs) var(--spacing-md);
+  background-color: var(--color-bg-secondary);
+  border-top: 1px solid var(--color-border);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+}
+
+.status-left,
+.status-right {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.separator {
+  color: var(--color-border);
+}
+
+.file-name {
+  color: var(--color-text-secondary);
+  
+  & .dirty-indicator {
+    color: var(--color-accent);
+    margin-left: 2px;
+  }
+}
+
+.word-count,
+.line-count,
+.encoding,
+.theme,
+.version {
+  color: var(--color-text-tertiary);
+}
