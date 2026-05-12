@@ -16,8 +16,52 @@
   width: 250px;
   border-right: 1px solid var(--color-border);
   background-color: var(--color-bg-secondary);
-  overflow: auto;
+  overflow: hidden;
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--color-border);
+  background-color: var(--color-bg-primary);
+}
+
+.sidebar-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: var(--spacing-sm);
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  transition: all var(--transition-fast);
+  
+  &:hover {
+    background-color: var(--color-bg-tertiary);
+  }
+  
+  &.active {
+    color: var(--color-accent);
+    background-color: var(--color-bg-secondary);
+    border-bottom: 2px solid var(--color-accent);
+  }
+}
+
+.sidebar-content {
+  flex: 1;
+  overflow: hidden;
+}
+
+.editor-main {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
 }
 
 .editor-pane {
@@ -39,4 +83,33 @@
 .preview-pane {
   overflow: auto;
   background-color: var(--preview-bg);
+}
+
+.export-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-top: 1px solid var(--color-border);
+  background-color: var(--color-bg-primary);
+  gap: var(--spacing-sm);
+}
+
+.export-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  
+  &:hover {
+    background-color: var(--color-bg-secondary);
+    border-color: var(--color-accent);
+  }
 }
