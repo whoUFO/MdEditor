@@ -108,6 +108,8 @@ pnpm test:e2e:ui
 - [x] StatusBar 组件
 - [x] Settings 组件
 - [x] TOC 组件
+- [x] TOC 增强功能（折叠、缩进、高亮）
+- [x] RecentFiles 组件（最近文件管理）
 - [x] FileTree 组件
 - [x] MainLayout 组件
 
@@ -189,6 +191,21 @@ pnpm test:e2e:ui
 - [x] TOC 面板显示
 - [x] 标题提取显示
 - [x] TOC 可见性切换
+- [x] TOC 折叠功能
+- [x] TOC 缩进显示
+- [x] TOC 活动标题高亮
+- [x] TOC 数量统计显示
+
+### 最近文件测试 ✨
+
+- [x] 最近文件列表显示
+- [x] 文件名称和路径显示
+- [x] 时间格式显示（刚刚、分钟前、小时前、天前）
+- [x] 空状态提示
+- [x] 清空所有按钮
+- [x] 打开文件功能
+- [x] 移除单个文件
+- [x] 当前文件高亮显示
 
 ### Resizer 功能测试
 
