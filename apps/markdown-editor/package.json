@@ -1,6 +1,6 @@
 {
   "name": "@markdown-editor/app",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "main": "dist/main/index.js",
   "type": "module",
@@ -67,20 +67,43 @@
   "build": {
     "appId": "com.markdown-editor.app",
     "productName": "Markdown Editor",
+    "copyright": "Copyright © 2026 Hu Yufeng",
     "directories": {
-      "output": "release"
+      "output": "release",
+      "buildResources": "build"
     },
     "files": [
       "dist/**/*"
     ],
+    "extraMetadata": {
+      "main": "dist/main/index.js"
+    },
     "mac": {
-      "target": ["dmg", "zip"]
+      "category": "public.app-category.productivity",
+      "target": ["dmg", "zip"],
+      "icon": "public/icon.svg",
+      "artifactName": "${productName}-${version}-mac.${ext}"
     },
     "win": {
-      "target": ["nsis", "portable"]
+      "target": ["nsis", "portable"],
+      "icon": "public/icon.svg",
+      "artifactName": "${productName}-${version}-win.${ext}"
     },
     "linux": {
-      "target": ["AppImage", "deb"]
+      "target": ["AppImage", "deb"],
+      "icon": "public/icon.svg",
+      "category": "Office",
+      "artifactName": "${productName}-${version}-linux.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "deleteAppDataOnUninstall": false
+    },
+    "publish": {
+      "provider": "generic",
+      "url": "https://example.com/releases"
     }
   }
 }
