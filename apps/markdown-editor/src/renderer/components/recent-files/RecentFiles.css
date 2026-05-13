@@ -1,0 +1,135 @@
+.recent-files {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.recent-files-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  border-bottom: 1px solid var(--color-border);
+  background-color: var(--color-bg-primary);
+}
+
+.recent-files-header-actions {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.clear-recent-btn {
+  font-size: var(--font-size-xs);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.clear-recent-btn:hover {
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
+}
+
+.recent-files-content {
+  flex: 1;
+  overflow: auto;
+  padding: var(--spacing-xs);
+}
+
+.recent-files-empty {
+  padding: var(--spacing-lg);
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.recent-file-item {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-sm) var(--spacing-sm);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-xs);
+  
+  &:hover {
+    background-color: var(--color-bg-tertiary);
+    
+    .recent-file-actions {
+      opacity: 1;
+    }
+  }
+  
+  &.active {
+    background-color: var(--color-accent-light);
+    color: var(--color-accent);
+  }
+}
+
+.recent-file-icon {
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+}
+
+.recent-file-info {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.recent-file-name {
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recent-file-path {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recent-file-time {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.recent-file-actions {
+  display: flex;
+  gap: var(--spacing-xs);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.recent-file-action {
+  padding: var(--spacing-xs);
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+  
+  &:hover {
+    background-color: var(--color-bg-secondary);
+    color: var(--color-text-primary);
+  }
+  
+  &.danger:hover {
+    color: var(--color-error);
+  }
+}

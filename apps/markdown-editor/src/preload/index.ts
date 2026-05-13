@@ -4,6 +4,7 @@ import type { ElectronAPI, FileTreeItem } from '@shared/types';
 const electronAPI: ElectronAPI = {
   files: {
     open: () => ipcRenderer.invoke('files:open'),
+    openPath: (path: string) => ipcRenderer.invoke('files:openPath', path),
     save: (path, content, encoding) => ipcRenderer.invoke('files:save', path, content, encoding),
     saveAs: (content, encoding) => ipcRenderer.invoke('files:saveAs', content, encoding),
     readDirectory: (path) => ipcRenderer.invoke('files:readDirectory', path),

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Folder, FolderOpen, FileText } from 'lucide-react';
 import { useFileStore } from '../../stores/fileStore';
 import { useEditorStore } from '../../stores/editorStore';
@@ -11,16 +11,18 @@ interface FileTreeItem {
   children?: FileTreeItem[];
 }
 
-export function FileTree(): React.JSX.Element {
-  const { fileTree, loadDirectory, openFile } = useFileStore();
+function TreeNode({ 
+  item, 
+  level = 0 
+}: { 
+  item: FileTreeItem; 
+  level?: number 
+}): React.JSX.Element {
+  const { loadDirectory, openFile } = useFileStore();
   const { setContent } = useEditorStore();
   const [expandedDirs, setExpandedDirs] = useState<Set<string>>(new Set());
-
-  useEffect(() => {
-    loadDirectory('/');
-  }, [loadDirectory]);
-
-  const toggleDirectory = (path: string) => {
+  
+  const toggleDirectory = useCallback((path: string) => {
     setExpandedDirs((prev) => {
       const next = new Set(prev);
       if (next.has(path)) {
@@ -30,16 +32,59 @@ export function FileTree(): React.JSX.Element {
       }
       return next;
     });
-  };
+  }, []);
 
-  const handleFileClick = async (item: FileTreeItem) => {
-    if (item.type === 'directory') {
-      toggleDirectory(item.path);
-      await loadDirectory(item.path);
+  const handleFileClick = useCallback(async (clickedItem: FileTreeItem) => {
+    if (clickedItem.type === 'directory') {
+      toggleDirectory(clickedItem.path);
+      await loadDirectory(clickedItem.path);
     } else {
-      await openFile();
+      await openFile(clickedItem.path);
     }
-  };
+  }, [toggleDirectory, loadDirectory, openFile]);
+
+  const isExpanded = expandedDirs.has(item.path);
+
+  return (
+    <>
+      <div
+        className={`file-tree-item ${item.type}`}
+        style={{ paddingLeft: `${level * 16}px` }}
+        onClick={() => handleFileClick(item)}
+      >
+        {item.type === 'directory' ? (
+          <>
+            {isExpanded ? (
+              <FolderOpen size={16} />
+            ) : (
+              <Folder size={16} />
+            )}
+            <span>{item.name}</span>
+          </>
+        ) : (
+          <>
+            <FileText size={16} />
+            <span>{item.name}</span>
+          </>
+        )}
+      </div>
+      {item.type === 'directory' && isExpanded && item.children?.map((child) => (
+        <TreeNode 
+          key={child.path} 
+          item={child} 
+          level={level + 1} 
+        />
+      ))}
+    </>
+  );
+}
+
+export function FileTree(): React.JSX.Element {
+  const { fileTree, loadDirectory } = useFileStore();
+
+  useEffect(() => {
+    loadDirectory('/');
+  }, [loadDirectory]);
 
   return (
     <div className="file-tree">
@@ -47,29 +92,13 @@ export function FileTree(): React.JSX.Element {
         <span>文件目录</span>
       </div>
       <div className="file-tree-content">
-        {fileTree.map((item) => (
-          <div
-            key={item.path}
-            className={`file-tree-item ${item.type}`}
-            onClick={() => handleFileClick(item)}
-          >
-            {item.type === 'directory' ? (
-              <>
-                {expandedDirs.has(item.path) ? (
-                  <FolderOpen size={16} />
-                ) : (
-                  <Folder size={16} />
-                )}
-                <span>{item.name}</span>
-              </>
-            ) : (
-              <>
-                <FileText size={16} />
-                <span>{item.name}</span>
-              </>
-            )}
-          </div>
-        ))}
+        {fileTree.length === 0 ? (
+          <div className="file-tree-empty">暂无文件</div>
+        ) : (
+          fileTree.map((item) => (
+            <TreeNode key={item.path} item={item} />
+          ))
+        )}
       </div>
     </div>
   );
