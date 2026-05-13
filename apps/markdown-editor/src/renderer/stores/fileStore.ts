@@ -15,6 +15,8 @@ interface FileStore {
   setCurrentFile: (file: FileState | null) => void;
   loadDirectory: (path: string) => Promise<void>;
   addRecentFile: (file: Omit<RecentFile, 'lastOpened'>) => void;
+  removeRecentFile: (path: string) => void;
+  clearRecentFiles: () => void;
   clearError: () => void;
 }
 
@@ -116,6 +118,15 @@ export const useFileStore = create<FileStore>((set, get) => ({
     newFiles.unshift({ ...file, lastOpened: Date.now() });
     
     set({ recentFiles: newFiles.slice(0, 10) });
+  },
+
+  removeRecentFile: (path) => {
+    const { recentFiles } = get();
+    set({ recentFiles: recentFiles.filter((f) => f.path !== path) });
+  },
+
+  clearRecentFiles: () => {
+    set({ recentFiles: [] });
   },
 
   clearError: () => {

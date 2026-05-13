@@ -5,14 +5,15 @@ import { Toolbar } from './Toolbar';
 import { StatusBar } from './StatusBar';
 import { FileTree } from '../file-tree/FileTree';
 import { TOC } from '../toc/TOC';
+import { RecentFiles } from '../recent-files/RecentFiles';
 import { useUIStore } from '../../stores/uiStore';
 import { useFileStore } from '../../stores/fileStore';
 import { useEditorStore } from '../../stores/editorStore';
 import { renderMarkdown } from '../../utils/markdown';
-import { FolderOpen, BookOpen, FileText, Download } from 'lucide-react';
+import { FolderOpen, BookOpen, FileText, Download, Clock } from 'lucide-react';
 import './MainLayout.css';
 
-type SidebarTab = 'files' | 'toc';
+type SidebarTab = 'files' | 'toc' | 'recent';
 
 export function MainLayout(): React.JSX.Element {
   const { previewVisible, splitRatio, sidebarVisible, toggleSidebar, setSplitRatio } = useUIStore();
@@ -123,6 +124,13 @@ export function MainLayout(): React.JSX.Element {
                 <span>文件</span>
               </button>
               <button
+                className={`sidebar-tab ${sidebarTab === 'recent' ? 'active' : ''}`}
+                onClick={() => setSidebarTab('recent')}
+              >
+                <Clock size={16} />
+                <span>最近</span>
+              </button>
+              <button
                 className={`sidebar-tab ${sidebarTab === 'toc' ? 'active' : ''}`}
                 onClick={() => setSidebarTab('toc')}
               >
@@ -132,6 +140,7 @@ export function MainLayout(): React.JSX.Element {
             </div>
             <div className="sidebar-content">
               {sidebarTab === 'files' && <FileTree />}
+              {sidebarTab === 'recent' && <RecentFiles />}
               {sidebarTab === 'toc' && <TOC />}
             </div>
           </div>
