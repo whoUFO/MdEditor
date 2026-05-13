@@ -44,7 +44,8 @@ export interface Settings {
 
 export interface ElectronAPI {
   files: {
-    open: () => Promise<{ path: string; content: string; encoding: string } | null>;
+    open: () => Promise<{ path: string; name: string; content: string; encoding: string } | null>;
+    openPath: (path: string) => Promise<{ path: string; name: string; content: string; encoding: string } | null>;
     save: (path: string, content: string, encoding: string) => Promise<boolean>;
     saveAs: (content: string, encoding: string) => Promise<string | null>;
     readDirectory: (path: string) => Promise<FileTreeItem[]>;
