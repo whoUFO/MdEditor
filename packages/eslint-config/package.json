@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "main": "index.js",
+  "scripts": {
+    "typecheck": "echo 'No typecheck needed'",
+    "lint": "echo 'No lint needed'"
+  },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",

@@ -1,24 +1,64 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { Editor } from '../editor/Editor';
 import { Preview } from '../preview/Preview';
 import { Toolbar } from './Toolbar';
 import { StatusBar } from './StatusBar';
 import { FileTree } from '../file-tree/FileTree';
 import { TOC } from '../toc/TOC';
+import { RecentFiles } from '../recent-files/RecentFiles';
 import { useUIStore } from '../../stores/uiStore';
 import { useFileStore } from '../../stores/fileStore';
 import { useEditorStore } from '../../stores/editorStore';
 import { renderMarkdown } from '../../utils/markdown';
-import { FolderOpen, BookOpen, FileText, Download } from 'lucide-react';
+import { FolderOpen, BookOpen, FileText, Download, Clock } from 'lucide-react';
 import './MainLayout.css';
 
-type SidebarTab = 'files' | 'toc';
+type SidebarTab = 'files' | 'toc' | 'recent';
 
 export function MainLayout(): React.JSX.Element {
-  const { previewVisible, splitRatio, sidebarVisible, toggleSidebar } = useUIStore();
+  const { previewVisible, splitRatio, sidebarVisible, toggleSidebar, setSplitRatio } = useUIStore();
   const { currentFile, saveFile } = useFileStore();
   const { content } = useEditorStore();
   const [sidebarTab, setSidebarTab] = useState<SidebarTab>('files');
+  
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isResizingRef = useRef(false);
+  const startXRef = useRef(0);
+  const startRatioRef = useRef(50);
+
+  const handleResizeStart = useCallback((e: React.MouseEvent) => {
+    isResizingRef.current = true;
+    startXRef.current = e.clientX;
+    startRatioRef.current = splitRatio;
+    
+    document.addEventListener('mousemove', handleResizeMove);
+    document.addEventListener('mouseup', handleResizeEnd);
+  }, [splitRatio]);
+
+  const handleResizeMove = useCallback((e: MouseEvent) => {
+    if (!isResizingRef.current || !containerRef.current) return;
+    
+    const containerWidth = containerRef.current.clientWidth;
+    const deltaX = e.clientX - startXRef.current;
+    const deltaRatio = (deltaX / containerWidth) * 100;
+    let newRatio = startRatioRef.current + deltaRatio;
+    
+    newRatio = Math.max(20, Math.min(80, newRatio));
+    setSplitRatio(newRatio);
+  }, [setSplitRatio]);
+
+  const handleResizeEnd = useCallback(() => {
+    isResizingRef.current = false;
+    document.removeEventListener('mousemove', handleResizeMove);
+    document.removeEventListener('mouseup', handleResizeEnd);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      document.removeEventListener('mousemove', handleResizeMove);
+      document.removeEventListener('mouseup', handleResizeEnd);
+    };
+  }, []);
 
   const handleExportHTML = async () => {
     const html = await renderMarkdown(content);
@@ -72,7 +112,7 @@ export function MainLayout(): React.JSX.Element {
   return (
     <div className="main-layout">
       <Toolbar />
-      <div className="editor-container">
+      <div className="editor-container" ref={containerRef}>
         {sidebarVisible && (
           <div className="sidebar">
             <div className="sidebar-tabs">
@@ -84,6 +124,13 @@ export function MainLayout(): React.JSX.Element {
                 <span>文件</span>
               </button>
               <button
+                className={`sidebar-tab ${sidebarTab === 'recent' ? 'active' : ''}`}
+                onClick={() => setSidebarTab('recent')}
+              >
+                <Clock size={16} />
+                <span>最近</span>
+              </button>
+              <button
                 className={`sidebar-tab ${sidebarTab === 'toc' ? 'active' : ''}`}
                 onClick={() => setSidebarTab('toc')}
               >
@@ -93,6 +140,7 @@ export function MainLayout(): React.JSX.Element {
             </div>
             <div className="sidebar-content">
               {sidebarTab === 'files' && <FileTree />}
+              {sidebarTab === 'recent' && <RecentFiles />}
               {sidebarTab === 'toc' && <TOC />}
             </div>
           </div>
@@ -103,7 +151,7 @@ export function MainLayout(): React.JSX.Element {
             className="editor-pane" 
             style={{ 
               flex: previewVisible ? splitRatio : 1,
-              transition: 'flex 0.2s ease'
+              transition: isResizingRef.current ? 'none' : 'flex 0.2s ease'
             }}
           >
             <Editor />
@@ -111,7 +159,10 @@ export function MainLayout(): React.JSX.Element {
           
           {previewVisible && (
             <>
-              <div className="resizer" />
+              <div 
+                className="resizer" 
+                onMouseDown={handleResizeStart}
+              />
               <div 
                 className="preview-pane" 
                 style={{ flex: 100 - splitRatio }}

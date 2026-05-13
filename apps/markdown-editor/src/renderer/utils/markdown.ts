@@ -131,6 +131,8 @@ export async function renderMarkdown(content: string): Promise<string> {
   return DOMPurify.sanitize(html);
 }
 
+export const parseMarkdown = renderMarkdown;
+
 export function parseToc(content: string): { level: number; text: string; id: string }[] {
   const lines = content.split('\n');
   const toc: { level: number; text: string; id: string }[] = [];
