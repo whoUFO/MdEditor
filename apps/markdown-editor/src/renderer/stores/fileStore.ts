@@ -9,7 +9,7 @@ interface FileStore {
   isLoading: boolean;
   error: string | null;
   
-  openFile: () => Promise<void>;
+  openFile: (path?: string) => Promise<void>;
   saveFile: () => Promise<void>;
   saveAsFile: () => Promise<void>;
   setCurrentFile: (file: FileState | null) => void;
@@ -25,10 +25,16 @@ export const useFileStore = create<FileStore>((set, get) => ({
   isLoading: false,
   error: null,
 
-  openFile: async () => {
+  openFile: async (path?: string) => {
     set({ isLoading: true, error: null });
     try {
-      const result = await window.electronAPI.files.open();
+      let result;
+      if (path) {
+        result = await window.electronAPI.files.openPath(path);
+      } else {
+        result = await window.electronAPI.files.open();
+      }
+      
       if (result) {
         const file: FileState = {
           path: result.path,
