@@ -121,11 +121,14 @@ export function TOC(): React.JSX.Element {
       <div key={group.id} className="toc-group" style={{ marginLeft: depth * 12 }}>
         <div
           className={`toc-item level-${group.level} ${activeId === group.id ? 'active' : ''}`}
+          data-level={group.level}
+          data-testid={`toc-item-${group.id}`}
           onClick={() => handleItemClick(group.id)}
         >
           {hasChildren && (
             <button
               className="toc-collapse-btn"
+              data-testid="toc-collapse-btn"
               onClick={(e) => {
                 e.stopPropagation();
                 toggleCollapse(group.id);
@@ -135,10 +138,10 @@ export function TOC(): React.JSX.Element {
             </button>
           )}
           {!hasChildren && <span className="toc-indent" />}
-          <span className="toc-text">{group.text}</span>
+          <span className="toc-text" data-testid={`toc-text-${group.id}`}>{group.text}</span>
         </div>
         {hasChildren && isExpanded && (
-          <div className="toc-children">
+          <div className="toc-children" data-testid="toc-children">
             {group.children.map((child) => renderTocGroup(child, depth + 1))}
           </div>
         )}
@@ -149,14 +152,14 @@ export function TOC(): React.JSX.Element {
   const tocTree = buildTocTree(toc);
 
   return (
-    <div className="toc">
+    <div className="toc" data-testid="toc-panel">
       <div className="toc-header">
         <span>目录</span>
-        <span className="toc-count">{toc.length}</span>
+        <span className="toc-count" data-testid="toc-count">{toc.length}</span>
       </div>
-      <div className="toc-content">
+      <div className="toc-content" data-testid="toc-content">
         {toc.length === 0 ? (
-          <div className="toc-empty">暂无目录</div>
+          <div className="toc-empty" data-testid="toc-empty">暂无目录</div>
         ) : (
           tocTree.map((group) => renderTocGroup(group))
         )}

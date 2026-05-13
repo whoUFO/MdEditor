@@ -110,15 +110,16 @@ export function MainLayout(): React.JSX.Element {
   };
 
   return (
-    <div className="main-layout">
+    <div className="main-layout" data-testid="main-layout">
       <Toolbar />
-      <div className="editor-container" ref={containerRef}>
+      <div className="editor-container" ref={containerRef} data-testid="editor-container">
         {sidebarVisible && (
-          <div className="sidebar">
+          <div className="sidebar" data-testid="sidebar">
             <div className="sidebar-tabs">
               <button
                 className={`sidebar-tab ${sidebarTab === 'files' ? 'active' : ''}`}
                 onClick={() => setSidebarTab('files')}
+                data-testid="files-tab"
               >
                 <FolderOpen size={16} />
                 <span>文件</span>
@@ -126,6 +127,7 @@ export function MainLayout(): React.JSX.Element {
               <button
                 className={`sidebar-tab ${sidebarTab === 'recent' ? 'active' : ''}`}
                 onClick={() => setSidebarTab('recent')}
+                data-testid="recent-tab"
               >
                 <Clock size={16} />
                 <span>最近</span>
@@ -133,12 +135,13 @@ export function MainLayout(): React.JSX.Element {
               <button
                 className={`sidebar-tab ${sidebarTab === 'toc' ? 'active' : ''}`}
                 onClick={() => setSidebarTab('toc')}
+                data-testid="toc-tab"
               >
                 <BookOpen size={16} />
                 <span>目录</span>
               </button>
             </div>
-            <div className="sidebar-content">
+            <div className="sidebar-content" data-testid="sidebar-content">
               {sidebarTab === 'files' && <FileTree />}
               {sidebarTab === 'recent' && <RecentFiles />}
               {sidebarTab === 'toc' && <TOC />}
@@ -146,13 +149,14 @@ export function MainLayout(): React.JSX.Element {
           </div>
         )}
         
-        <div className="editor-main">
+        <div className="editor-main" data-testid="editor-main">
           <div 
             className="editor-pane" 
             style={{ 
               flex: previewVisible ? splitRatio : 1,
               transition: isResizingRef.current ? 'none' : 'flex 0.2s ease'
             }}
+            data-testid="editor-pane"
           >
             <Editor />
           </div>
@@ -162,10 +166,12 @@ export function MainLayout(): React.JSX.Element {
               <div 
                 className="resizer" 
                 onMouseDown={handleResizeStart}
+                data-testid="resizer"
               />
               <div 
                 className="preview-pane" 
                 style={{ flex: 100 - splitRatio }}
+                data-testid="preview-pane"
               >
                 <Preview />
               </div>
@@ -173,12 +179,12 @@ export function MainLayout(): React.JSX.Element {
           )}
         </div>
       </div>
-      <div className="export-bar">
-        <button className="export-btn" onClick={handleExportHTML}>
+      <div className="export-bar" data-testid="export-bar">
+        <button className="export-btn" onClick={handleExportHTML} data-testid="export-html-btn">
           <Download size={14} />
           <span>导出 HTML</span>
         </button>
-        <button className="export-btn" onClick={handleExportPDF}>
+        <button className="export-btn" onClick={handleExportPDF} data-testid="export-pdf-btn">
           <FileText size={14} />
           <span>导出 PDF</span>
         </button>
