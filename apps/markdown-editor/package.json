@@ -91,7 +91,7 @@
         "dmg",
         "zip"
       ],
-      "icon": "public/icon.svg",
+      "icon": "build/icon.icns",
       "artifactName": "${productName}-${version}-mac.${ext}"
     },
     "win": {
@@ -99,7 +99,7 @@
         "nsis",
         "portable"
       ],
-      "icon": "public/icon.svg",
+      "icon": "build/icon.ico",
       "artifactName": "${productName}-${version}-win.${ext}"
     },
     "linux": {
@@ -107,7 +107,7 @@
         "AppImage",
         "deb"
       ],
-      "icon": "public/icon.svg",
+      "icon": "build/icons",
       "category": "Office",
       "artifactName": "${productName}-${version}-linux.${ext}"
     },
