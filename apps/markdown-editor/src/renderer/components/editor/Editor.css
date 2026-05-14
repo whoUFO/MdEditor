@@ -42,10 +42,10 @@
 .editor .cm-lineNumbers .cm-lineNumber {
   color: var(--color-text-tertiary);
   padding: 0 var(--spacing-md);
-  font-size: 12px;
+  font-size: 11px;
   font-family: var(--font-mono);
-  text-align: right;
-  letter-spacing: 0.5px;
+  text-align: left;
+  letter-spacing: 0.3px;
   transition: color var(--transition-fast);
 }
 
