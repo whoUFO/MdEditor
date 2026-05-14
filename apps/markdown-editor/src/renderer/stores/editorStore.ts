@@ -3,6 +3,7 @@ import type { EditorState } from '@shared/types';
 
 interface EditorStore extends EditorState {
   setContent: (content: string) => void;
+  loadContent: (content: string) => void;
   setCursorPosition: (pos: { line: number; column: number }) => void;
   setSelection: (selection: { from: number; to: number } | null) => void;
   markDirty: (dirty: boolean) => void;
@@ -20,6 +21,13 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     const current = get().content;
     if (content !== current) {
       set({ content, isDirty: true });
+    }
+  },
+
+  loadContent: (content) => {
+    const current = get().content;
+    if (content !== current) {
+      set({ content, isDirty: false });
     }
   },
 

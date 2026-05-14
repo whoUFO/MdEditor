@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import type { ElectronAPI, FileTreeItem } from '@shared/types';
+import type { ElectronAPI } from '@shared/types';
 
 const electronAPI: ElectronAPI = {
   files: {
@@ -14,6 +14,7 @@ const electronAPI: ElectronAPI = {
     maximize: () => ipcRenderer.invoke('window:maximize'),
     close: () => ipcRenderer.invoke('window:close'),
     isMaximized: () => ipcRenderer.invoke('window:isMaximized'),
+    showConfirm: (message: string, detail?: string) => ipcRenderer.invoke('window:showConfirm', message, detail),
   },
   app: {
     getVersion: () => ipcRenderer.invoke('app:getVersion'),

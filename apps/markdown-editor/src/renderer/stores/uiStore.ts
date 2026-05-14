@@ -6,6 +6,7 @@ interface UIState {
   splitRatio: number;
   sidebarVisible: boolean;
   theme: 'light' | 'dark';
+  syncScroll: boolean;
   
   togglePreview: () => void;
   setPreviewVisible: (visible: boolean) => void;
@@ -14,6 +15,8 @@ interface UIState {
   setSidebarVisible: (visible: boolean) => void;
   toggleTheme: () => void;
   setTheme: (theme: 'light' | 'dark') => void;
+  toggleSyncScroll: () => void;
+  setSyncScroll: (sync: boolean) => void;
 }
 
 export const useUIStore = create<UIState>()(
@@ -23,6 +26,7 @@ export const useUIStore = create<UIState>()(
       splitRatio: 50,
       sidebarVisible: true,
       theme: 'light',
+      syncScroll: true,
 
       togglePreview: () => {
         set({ previewVisible: !get().previewVisible });
@@ -53,6 +57,14 @@ export const useUIStore = create<UIState>()(
       setTheme: (theme) => {
         set({ theme });
         document.documentElement.setAttribute('data-theme', theme);
+      },
+
+      toggleSyncScroll: () => {
+        set({ syncScroll: !get().syncScroll });
+      },
+
+      setSyncScroll: (sync) => {
+        set({ syncScroll: sync });
       },
     }),
     {
