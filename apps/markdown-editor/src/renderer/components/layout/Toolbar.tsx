@@ -1,5 +1,5 @@
 import React from 'react';
-import { FolderOpen, Save, Eye, EyeOff, Sun, Moon, Bold, Italic, Code, Heading1, List, ListOrdered, Quote, Code2, Link, Image, Minus, PanelLeft, PanelLeftClose } from 'lucide-react';
+import { FolderOpen, Save, Eye, EyeOff, Sun, Moon, Bold, Italic, Code, Heading1, List, ListOrdered, Quote, Code2, Link, Image, Minus, PanelLeft, PanelLeftClose, ArrowDownUp } from 'lucide-react';
 import { useFileStore } from '../../stores/fileStore';
 import { useUIStore } from '../../stores/uiStore';
 import { useEditorStore } from '../../stores/editorStore';
@@ -21,7 +21,7 @@ const formatButtons = [
 
 export function Toolbar(): React.JSX.Element {
   const { openFile, saveFile, saveAsFile } = useFileStore();
-  const { previewVisible, togglePreview, theme, toggleTheme, sidebarVisible, toggleSidebar } = useUIStore();
+  const { previewVisible, togglePreview, theme, toggleTheme, sidebarVisible, toggleSidebar, syncScroll, toggleSyncScroll } = useUIStore();
   const { insertText, getSelectedText } = useEditorStore();
 
   const handleFormatAction = (action: string) => {
@@ -170,6 +170,14 @@ export function Toolbar(): React.JSX.Element {
       <div className="toolbar-divider" />
 
       <div className="toolbar-group">
+        <button
+          onClick={toggleSyncScroll}
+          title={`${syncScroll ? '关闭' : '开启'}同步滚动`}
+          data-testid="sync-scroll-btn"
+          className={syncScroll ? 'active' : ''}
+        >
+          <ArrowDownUp size={18} />
+        </button>
         <button
           onClick={togglePreview}
           title={`${previewVisible ? '隐藏预览' : '显示预览'} (Ctrl+Shift+P)`}

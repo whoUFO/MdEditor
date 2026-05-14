@@ -28,6 +28,30 @@ export const useFileStore = create<FileStore>((set, get) => ({
   error: null,
 
   openFile: async (path?: string) => {
+    const editorState = useEditorStore.getState();
+    const { currentFile } = get();
+
+    if (editorState.isDirty && currentFile) {
+      const result = await window.electronAPI.window.showConfirm(
+        `文件 "${currentFile.name}" 已修改`,
+        '是否保存更改？'
+      );
+
+      if (result === 'save') {
+        const content = useEditorStore.getState().content;
+        const success = await window.electronAPI.files.save(
+          currentFile.path,
+          content,
+          currentFile.encoding
+        );
+        if (success) {
+          useEditorStore.getState().markDirty(false);
+        }
+      } else if (result === 'cancel') {
+        return;
+      }
+    }
+
     set({ isLoading: true, error: null });
     try {
       let result;
@@ -46,8 +70,7 @@ export const useFileStore = create<FileStore>((set, get) => ({
         };
         set({ currentFile: file });
         get().addRecentFile({ path: result.path, name: result.name });
-        useEditorStore.getState().setContent(result.content);
-        useEditorStore.getState().markDirty(false);
+        useEditorStore.getState().loadContent(result.content);
       }
     } catch (error) {
       set({ error: 'Failed to open file' });

@@ -42,6 +42,8 @@ export interface Settings {
   spellCheck: boolean;
 }
 
+export type ConfirmResult = 'save' | 'discard' | 'cancel';
+
 export interface ElectronAPI {
   files: {
     open: () => Promise<{ path: string; name: string; content: string; encoding: string } | null>;
@@ -55,6 +57,7 @@ export interface ElectronAPI {
     maximize: () => void;
     close: () => void;
     isMaximized: () => Promise<boolean>;
+    showConfirm: (message: string, detail?: string) => Promise<ConfirmResult>;
   };
   app: {
     getVersion: () => Promise<string>;

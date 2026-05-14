@@ -4,6 +4,7 @@ import { basicSetup } from 'codemirror';
 import { markdown, markdownLanguage } from '@codemirror/lang-markdown';
 import { languages } from '@codemirror/language-data';
 import { useEditorStore } from '../../stores/editorStore';
+import { useUIStore } from '../../stores/uiStore';
 import './Editor.css';
 
 let editorScrollHandler: ((scrollTop: number) => void) | null = null;
@@ -16,6 +17,7 @@ export function Editor(): React.JSX.Element {
   const editorRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
   const { content, setContent, setCursorPosition, setSelection } = useEditorStore();
+  const { syncScroll } = useUIStore();
   const isSyncingRef = useRef(false);
 
   useEffect(() => {
@@ -56,32 +58,28 @@ export function Editor(): React.JSX.Element {
 
     const scrollEl = view.scrollDOM;
     if (scrollEl) {
-      scrollEl.addEventListener('scroll', () => {
-        if (!isSyncingRef.current && editorScrollHandler) {
+      const handleScroll = () => {
+        if (!isSyncingRef.current && editorScrollHandler && syncScroll) {
           const scrollHeight = scrollEl.scrollHeight - scrollEl.clientHeight;
           const scrollPercent = scrollHeight > 0 ? scrollEl.scrollTop / scrollHeight : 0;
           editorScrollHandler(scrollPercent);
         }
-      });
-    }
+      };
 
-    window.syncEditorScroll = (percent: number) => {
-      isSyncingRef.current = true;
-      const scrollEl = view.scrollDOM;
-      if (scrollEl) {
-        const scrollHeight = scrollEl.scrollHeight - scrollEl.clientHeight;
-        scrollEl.scrollTop = percent * scrollHeight;
-      }
-      setTimeout(() => {
-        isSyncingRef.current = false;
-      }, 50);
-    };
+      scrollEl.addEventListener('scroll', handleScroll);
+
+      return () => {
+        scrollEl.removeEventListener('scroll', handleScroll);
+        view.destroy();
+        window.syncEditorScroll = undefined;
+      };
+    }
 
     return () => {
       view.destroy();
       window.syncEditorScroll = undefined;
     };
-  }, []);
+  }, [syncScroll]);
 
   useEffect(() => {
     if (viewRef.current && viewRef.current.state.doc.toString() !== content) {
