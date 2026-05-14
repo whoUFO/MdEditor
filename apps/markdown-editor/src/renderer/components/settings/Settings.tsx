@@ -31,16 +31,16 @@ export function Settings({ isOpen, onClose }: SettingsProps): React.JSX.Element 
 
         <div className="settings-content">
           <div className="settings-section">
-            <h3>外观</h3>
+            <h3 className="settings-section-title">外观</h3>
 
             <div className="settings-item">
-              <div className="settings-label">
+              <div className="settings-item-label">
                 <span>深色模式</span>
-                <small>切换深色/浅色主题</small>
+                <div className="settings-item-description">切换深色/浅色主题</div>
               </div>
               <div className="settings-control">
                 <button
-                  className={`toggle-switch ${settings.theme === 'dark' ? 'active' : ''}`}
+                  className={`settings-toggle ${settings.theme === 'dark' ? 'active' : ''}`}
                   onClick={() => settings.updateSettings({
                     theme: settings.theme === 'light' ? 'dark' : 'light'
                   })}
@@ -50,23 +50,23 @@ export function Settings({ isOpen, onClose }: SettingsProps): React.JSX.Element 
             </div>
 
             <div className="settings-item">
-              <div className="settings-label">
+              <div className="settings-item-label">
                 <span>字体大小</span>
-                <small>编辑器字体大小 (12-24px)</small>
+                <div className="settings-item-description">编辑器字体大小 (12-24px)</div>
               </div>
               <div className="settings-control">
-                <div className="font-size-control">
+                <div className="settings-input-group">
                   <button
-                    className="font-size-btn"
+                    className="settings-btn"
                     onClick={() => settings.updateSettings({ 
                       fontSize: Math.max(12, settings.fontSize - 1) 
                     })}
                   >
                     -
                   </button>
-                  <span className="font-size-value">{settings.fontSize}px</span>
+                  <span className="settings-input-value">{settings.fontSize}px</span>
                   <button
-                    className="font-size-btn"
+                    className="settings-btn"
                     onClick={() => settings.updateSettings({ 
                       fontSize: Math.min(24, settings.fontSize + 1) 
                     })}
@@ -79,16 +79,16 @@ export function Settings({ isOpen, onClose }: SettingsProps): React.JSX.Element 
           </div>
 
           <div className="settings-section">
-            <h3>编辑器</h3>
+            <h3 className="settings-section-title">编辑器</h3>
 
             <div className="settings-item">
-              <div className="settings-label">
+              <div className="settings-item-label">
                 <span>行号</span>
-                <small>显示行号</small>
+                <div className="settings-item-description">显示行号</div>
               </div>
               <div className="settings-control">
                 <button
-                  className={`toggle-switch ${settings.lineNumbers ? 'active' : ''}`}
+                  className={`settings-toggle ${settings.lineNumbers ? 'active' : ''}`}
                   onClick={() => settings.updateSettings({ 
                     lineNumbers: !settings.lineNumbers 
                   })}
@@ -97,13 +97,13 @@ export function Settings({ isOpen, onClose }: SettingsProps): React.JSX.Element 
             </div>
 
             <div className="settings-item">
-              <div className="settings-label">
+              <div className="settings-item-label">
                 <span>自动换行</span>
-                <small>长行自动换行</small>
+                <div className="settings-item-description">长行自动换行</div>
               </div>
               <div className="settings-control">
                 <button
-                  className={`toggle-switch ${settings.wordWrap ? 'active' : ''}`}
+                  className={`settings-toggle ${settings.wordWrap ? 'active' : ''}`}
                   onClick={() => settings.updateSettings({ 
                     wordWrap: !settings.wordWrap 
                   })}
@@ -112,13 +112,13 @@ export function Settings({ isOpen, onClose }: SettingsProps): React.JSX.Element 
             </div>
 
             <div className="settings-item">
-              <div className="settings-label">
+              <div className="settings-item-label">
                 <span>拼写检查</span>
-                <small>启用拼写检查</small>
+                <div className="settings-item-description">启用拼写检查</div>
               </div>
               <div className="settings-control">
                 <button
-                  className={`toggle-switch ${settings.spellCheck ? 'active' : ''}`}
+                  className={`settings-toggle ${settings.spellCheck ? 'active' : ''}`}
                   onClick={() => settings.updateSettings({ 
                     spellCheck: !settings.spellCheck 
                   })}
@@ -128,16 +128,16 @@ export function Settings({ isOpen, onClose }: SettingsProps): React.JSX.Element 
           </div>
 
           <div className="settings-section">
-            <h3>自动保存</h3>
+            <h3 className="settings-section-title">自动保存</h3>
 
             <div className="settings-item">
-              <div className="settings-label">
+              <div className="settings-item-label">
                 <span>启用自动保存</span>
-                <small>定期自动保存文档</small>
+                <div className="settings-item-description">定期自动保存文档</div>
               </div>
               <div className="settings-control">
                 <button
-                  className={`toggle-switch ${settings.autoSave ? 'active' : ''}`}
+                  className={`settings-toggle ${settings.autoSave ? 'active' : ''}`}
                   onClick={() => settings.updateSettings({ 
                     autoSave: !settings.autoSave 
                   })}
@@ -147,23 +147,23 @@ export function Settings({ isOpen, onClose }: SettingsProps): React.JSX.Element 
 
             {settings.autoSave && (
               <div className="settings-item">
-                <div className="settings-label">
+                <div className="settings-item-label">
                   <span>自动保存间隔</span>
-                  <small>保存间隔时间（秒）</small>
+                  <div className="settings-item-description">保存间隔时间（秒）</div>
                 </div>
                 <div className="settings-control">
-                  <div className="font-size-control">
+                  <div className="settings-input-group">
                     <button
-                      className="font-size-btn"
+                      className="settings-btn"
                       onClick={() => settings.updateSettings({ 
                         autoSaveInterval: Math.max(10, settings.autoSaveInterval - 10) 
                       })}
                     >
                       -
                     </button>
-                    <span className="font-size-value">{settings.autoSaveInterval}s</span>
+                    <span className="settings-input-value">{settings.autoSaveInterval}s</span>
                     <button
-                      className="font-size-btn"
+                      className="settings-btn"
                       onClick={() => settings.updateSettings({ 
                         autoSaveInterval: Math.min(300, settings.autoSaveInterval + 10) 
                       })}

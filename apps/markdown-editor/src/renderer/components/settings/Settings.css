@@ -112,7 +112,25 @@
 .settings-item-description {
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
-  margin-top: var(--spacing-xs);
+  margin-top: 4px;
+}
+
+.settings-control {
+  display: flex;
+  align-items: center;
+}
+
+.settings-input-group {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.settings-input-value {
+  font-size: var(--font-size-md);
+  color: var(--color-text-primary);
+  min-width: 60px;
+  text-align: center;
 }
 
 .settings-toggle {
