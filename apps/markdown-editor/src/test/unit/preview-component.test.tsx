@@ -10,7 +10,7 @@ vi.mock('../../renderer/stores/editorStore', () => ({
 describe('Preview Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (useEditorStore as any).mockReturnValue({
+    (useEditorStore as unknown as Mock).mockReturnValue({
       content: '',
     });
   });
@@ -26,7 +26,7 @@ describe('Preview Component', () => {
   });
 
   it('should render heading elements', async () => {
-    (useEditorStore as any).mockReturnValue({
+    (useEditorStore as unknown as Mock).mockReturnValue({
       content: '# Heading 1\n## Heading 2\n### Heading 3',
     });
 
@@ -44,7 +44,7 @@ describe('Preview Component', () => {
   });
 
   it('should render bold text', async () => {
-    (useEditorStore as any).mockReturnValue({
+    (useEditorStore as unknown as Mock).mockReturnValue({
       content: '**bold text**',
     });
 
@@ -57,7 +57,7 @@ describe('Preview Component', () => {
   });
 
   it('should render italic text', async () => {
-    (useEditorStore as any).mockReturnValue({
+    (useEditorStore as unknown as Mock).mockReturnValue({
       content: '*italic text*',
     });
 
@@ -70,7 +70,7 @@ describe('Preview Component', () => {
   });
 
   it('should render code blocks', async () => {
-    (useEditorStore as any).mockReturnValue({
+    (useEditorStore as unknown as Mock).mockReturnValue({
       content: '```javascript\nconst x = 1;\n```',
     });
 
@@ -82,7 +82,7 @@ describe('Preview Component', () => {
   });
 
   it('should render lists', async () => {
-    (useEditorStore as any).mockReturnValue({
+    (useEditorStore as unknown as Mock).mockReturnValue({
       content: '- Item 1\n- Item 2\n- Item 3',
     });
 
@@ -95,7 +95,7 @@ describe('Preview Component', () => {
   });
 
   it('should render blockquotes', async () => {
-    (useEditorStore as any).mockReturnValue({
+    (useEditorStore as unknown as Mock).mockReturnValue({
       content: '> This is a quote',
     });
 
@@ -107,7 +107,7 @@ describe('Preview Component', () => {
   });
 
   it('should render links', async () => {
-    (useEditorStore as any).mockReturnValue({
+    (useEditorStore as unknown as Mock).mockReturnValue({
       content: '[Link Text](https://example.com)',
     });
 
@@ -122,7 +122,7 @@ describe('Preview Component', () => {
   });
 
   it('should render horizontal rules', async () => {
-    (useEditorStore as any).mockReturnValue({
+    (useEditorStore as unknown as Mock).mockReturnValue({
       content: '---',
     });
 

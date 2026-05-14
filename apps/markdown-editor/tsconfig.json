@@ -31,6 +31,7 @@
     "allowSyntheticDefaultImports": true,
     "jsx": "react-jsx",
     "types": ["electron", "node"],
+    "ignoreDeprecations": "6.0",
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/renderer/*"],

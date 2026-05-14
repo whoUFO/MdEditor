@@ -14,7 +14,7 @@ export function StatusBar(): React.JSX.Element {
   const lineCount = countLines(content);
 
   return (
-    <div className="status-bar">
+    <div className="status-bar" data-testid="status-bar">
       <div className="status-left">
         <span className="file-name">
           {currentFile?.name || '未命名'}

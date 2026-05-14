@@ -10,7 +10,7 @@ vi.mock('../../renderer/stores/fileStore', () => ({
 describe('FileTree Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (useFileStore as any).mockReturnValue({
+    (useFileStore as unknown as Mock).mockReturnValue({
       fileTree: [
         {
           name: 'documents',
@@ -44,7 +44,7 @@ describe('FileTree Component', () => {
 
   it('should expand directory on click', async () => {
     const toggleDirectory = vi.fn();
-    (useFileStore as any).mockReturnValue({
+    (useFileStore as unknown as Mock).mockReturnValue({
       fileTree: [
         { name: 'documents', path: '/documents', type: 'directory', children: [] },
       ],
@@ -64,7 +64,7 @@ describe('FileTree Component', () => {
 
   it('should open file on click', () => {
     const openFile = vi.fn();
-    (useFileStore as any).mockReturnValue({
+    (useFileStore as unknown as Mock).mockReturnValue({
       fileTree: [
         { name: 'test.md', path: '/test.md', type: 'file' },
       ],

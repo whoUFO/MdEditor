@@ -87,7 +87,7 @@ export function FileTree(): React.JSX.Element {
   }, [loadDirectory]);
 
   return (
-    <div className="file-tree">
+    <div className="file-tree" data-testid="file-tree">
       <div className="file-tree-header">
         <span>文件目录</span>
       </div>

@@ -149,7 +149,7 @@ export function TOC(): React.JSX.Element {
   const tocTree = buildTocTree(toc);
 
   return (
-    <div className="toc">
+    <div className="toc" data-testid="toc-panel">
       <div className="toc-header">
         <span>目录</span>
         <span className="toc-count">{toc.length}</span>

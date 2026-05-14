@@ -12,7 +12,7 @@ import mermaid from 'mermaid';
 import 'katex/dist/katex.min.css';
 import hljs from 'highlight.js';
 import { visit } from 'unist-util-visit';
-import { h } from 'hastscript';
+import type { Root, Heading, Code, Text, Parent } from 'mdast';
 
 mermaid.initialize({
   startOnLoad: false,
@@ -20,9 +20,9 @@ mermaid.initialize({
 });
 
 function remarkAddHeadingIds() {
-  return (tree: any) => {
-    visit(tree, 'heading', (node: any) => {
-      const textNode = node.children.find((child: any) => child.type === 'text');
+  return (tree: Root) => {
+    visit(tree, 'heading', (node: Heading) => {
+      const textNode = node.children.find((child): child is Text => child.type === 'text');
       if (textNode) {
         const id = textNode.value.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
         node.data = node.data || {};
@@ -34,14 +34,14 @@ function remarkAddHeadingIds() {
 }
 
 function remarkMermaid() {
-  return (tree: any) => {
-    visit(tree, 'code', (node: any, index: number, parent: any) => {
+  return (tree: Root) => {
+    visit(tree, 'code', (node: Code, index: number, parent: Parent) => {
       if (node.lang === 'mermaid') {
         const id = `mermaid-${Math.random().toString(36).substr(2, 9)}`;
         parent.children[index] = {
           type: 'html',
           value: `<div class="mermaid" id="${id}">${node.value}</div>`,
-        };
+        } as unknown as Code;
       }
     });
   };

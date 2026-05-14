@@ -10,7 +10,7 @@ vi.mock('../../renderer/stores/fileStore', () => ({
 describe('RecentFiles Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (useFileStore as any).mockReturnValue({
+    (useFileStore as unknown as Mock).mockReturnValue({
       recentFiles: [
         { path: '/path/to/file1.md', name: 'file1.md', lastOpened: Date.now() - 60000 },
         { path: '/path/to/file2.md', name: 'file2.md', lastOpened: Date.now() - 3600000 },
@@ -50,7 +50,7 @@ describe('RecentFiles Component', () => {
   });
 
   it('should show empty state when no recent files', () => {
-    (useFileStore as any).mockReturnValue({
+    (useFileStore as unknown as Mock).mockReturnValue({
       recentFiles: [],
       currentFile: null,
       openFile: vi.fn(),
@@ -68,7 +68,7 @@ describe('RecentFiles Component', () => {
   });
 
   it('should hide clear button when no files', () => {
-    (useFileStore as any).mockReturnValue({
+    (useFileStore as unknown as Mock).mockReturnValue({
       recentFiles: [],
       currentFile: null,
       openFile: vi.fn(),
@@ -82,7 +82,7 @@ describe('RecentFiles Component', () => {
 
   it('should call openFile when clicking file item', () => {
     const openFile = vi.fn();
-    (useFileStore as any).mockReturnValue({
+    (useFileStore as unknown as Mock).mockReturnValue({
       recentFiles: [
         { path: '/path/to/file1.md', name: 'file1.md', lastOpened: Date.now() },
       ],
@@ -100,7 +100,7 @@ describe('RecentFiles Component', () => {
 
   it('should call removeRecentFile when clicking delete button', () => {
     const removeRecentFile = vi.fn();
-    (useFileStore as any).mockReturnValue({
+    (useFileStore as unknown as Mock).mockReturnValue({
       recentFiles: [
         { path: '/path/to/file1.md', name: 'file1.md', lastOpened: Date.now() },
       ],
@@ -120,7 +120,7 @@ describe('RecentFiles Component', () => {
 
   it('should call clearRecentFiles when clicking clear all', () => {
     const clearRecentFiles = vi.fn();
-    (useFileStore as any).mockReturnValue({
+    (useFileStore as unknown as Mock).mockReturnValue({
       recentFiles: [
         { path: '/path/to/file1.md', name: 'file1.md', lastOpened: Date.now() },
         { path: '/path/to/file2.md', name: 'file2.md', lastOpened: Date.now() },
@@ -138,7 +138,7 @@ describe('RecentFiles Component', () => {
   });
 
   it('should highlight active file', () => {
-    (useFileStore as any).mockReturnValue({
+    (useFileStore as unknown as Mock).mockReturnValue({
       recentFiles: [
         { path: '/path/to/file1.md', name: 'file1.md', lastOpened: Date.now() },
       ],
@@ -154,7 +154,7 @@ describe('RecentFiles Component', () => {
   });
 
   it('should display "刚刚" for very recent files', () => {
-    (useFileStore as any).mockReturnValue({
+    (useFileStore as unknown as Mock).mockReturnValue({
       recentFiles: [
         { path: '/path/to/file1.md', name: 'file1.md', lastOpened: Date.now() },
       ],
@@ -172,7 +172,7 @@ describe('RecentFiles Component', () => {
     const oldDate = new Date();
     oldDate.setDate(oldDate.getDate() - 10);
     
-    (useFileStore as any).mockReturnValue({
+    (useFileStore as unknown as Mock).mockReturnValue({
       recentFiles: [
         { path: '/path/to/file1.md', name: 'file1.md', lastOpened: oldDate.getTime() },
       ],

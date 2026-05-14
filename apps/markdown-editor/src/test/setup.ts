@@ -1,8 +1,6 @@
-import { expect, afterEach } from 'vitest';
+import { afterEach } from 'vitest';
 import { cleanup } from '@testing-library/react';
-import * as matchers from '@testing-library/jest-dom/matchers';
-
-expect.extend(matchers);
+import '@testing-library/jest-dom/vitest';
 
 afterEach(() => {
   cleanup();
@@ -24,8 +22,8 @@ window.electronAPI = {
     isMaximized: async () => false,
   },
   app: {
-    getVersion: async () => '0.1.0',
-    getPlatform: async () => 'test',
+    getVersion: () => Promise.resolve('0.1.0'),
+    getPlatform: () => Promise.resolve('test'),
   },
   printToPDF: async () => {},
 };
