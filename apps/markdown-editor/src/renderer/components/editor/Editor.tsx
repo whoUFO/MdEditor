@@ -5,6 +5,7 @@ import { markdown, markdownLanguage } from '@codemirror/lang-markdown';
 import { languages } from '@codemirror/language-data';
 import { useEditorStore } from '../../stores/editorStore';
 import { useUIStore } from '../../stores/uiStore';
+import { useSettingsStore } from '../../stores/settingsStore';
 import './Editor.css';
 
 let editorScrollHandler: ((scrollTop: number) => void) | null = null;
@@ -18,39 +19,46 @@ export function Editor(): React.JSX.Element {
   const viewRef = useRef<EditorView | null>(null);
   const { content, setContent, setCursorPosition, setSelection } = useEditorStore();
   const { syncScroll } = useUIStore();
+  const { wordWrap } = useSettingsStore();
   const isSyncingRef = useRef(false);
 
   useEffect(() => {
     if (!editorRef.current) return;
 
+    const extensions = [
+      basicSetup,
+      markdown({ base: markdownLanguage, codeLanguages: languages }),
+      EditorView.updateListener.of((update) => {
+        if (update.docChanged) {
+          setContent(update.state.doc.toString());
+        }
+        
+        const cursor = update.state.selection.main.head;
+        const line = update.state.doc.lineAt(cursor);
+        setCursorPosition({ 
+          line: line.number, 
+          column: cursor - line.from + 1 
+        });
+        
+        const selection = update.state.selection;
+        if (selection.ranges.length > 0 && !selection.main.empty) {
+          setSelection({
+            from: selection.main.from,
+            to: selection.main.to,
+          });
+        } else {
+          setSelection(null);
+        }
+      }),
+    ];
+
+    if (wordWrap) {
+      extensions.push(EditorView.lineWrapping);
+    }
+
     const view = new EditorView({
       doc: content,
-      extensions: [
-        basicSetup,
-        markdown({ base: markdownLanguage, codeLanguages: languages }),
-        EditorView.updateListener.of((update) => {
-          if (update.docChanged) {
-            setContent(update.state.doc.toString());
-          }
-          
-          const cursor = update.state.selection.main.head;
-          const line = update.state.doc.lineAt(cursor);
-          setCursorPosition({ 
-            line: line.number, 
-            column: cursor - line.from + 1 
-          });
-          
-          const selection = update.state.selection;
-          if (selection.ranges.length > 0 && !selection.main.empty) {
-            setSelection({
-              from: selection.main.from,
-              to: selection.main.to,
-            });
-          } else {
-            setSelection(null);
-          }
-        }),
-      ],
+      extensions,
       parent: editorRef.current,
     });
 
@@ -79,7 +87,7 @@ export function Editor(): React.JSX.Element {
       view.destroy();
       window.syncEditorScroll = undefined;
     };
-  }, [syncScroll]);
+  }, [syncScroll, wordWrap]);
 
   useEffect(() => {
     if (viewRef.current && viewRef.current.state.doc.toString() !== content) {

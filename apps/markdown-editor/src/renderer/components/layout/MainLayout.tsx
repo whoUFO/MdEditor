@@ -15,7 +15,11 @@ import './MainLayout.css';
 
 type SidebarTab = 'files' | 'toc' | 'recent';
 
-export function MainLayout(): React.JSX.Element {
+interface MainLayoutProps {
+  onOpenSettings: () => void;
+}
+
+export function MainLayout({ onOpenSettings }: MainLayoutProps): React.JSX.Element {
   const { previewVisible, splitRatio, sidebarVisible, toggleSidebar, setSplitRatio } = useUIStore();
   const { currentFile, saveFile } = useFileStore();
   const { content } = useEditorStore();
@@ -210,7 +214,7 @@ export function MainLayout(): React.JSX.Element {
 
   return (
     <div className="main-layout" data-testid="main-layout">
-      <Toolbar />
+      <Toolbar onOpenSettings={onOpenSettings} />
       <div className="editor-container" ref={containerRef}>
         {sidebarVisible && (
           <div className="sidebar" data-testid="sidebar">

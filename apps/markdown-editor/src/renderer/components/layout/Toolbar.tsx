@@ -1,5 +1,5 @@
 import React from 'react';
-import { FolderOpen, Save, Eye, EyeOff, Sun, Moon, Bold, Italic, Code, Heading1, List, ListOrdered, Quote, Code2, Link, Image, Minus, PanelLeft, PanelLeftClose, ArrowDownUp } from 'lucide-react';
+import { FolderOpen, Save, Eye, EyeOff, Sun, Moon, Bold, Italic, Code, Heading1, List, ListOrdered, Quote, Code2, Link, Image, Minus, PanelLeft, PanelLeftClose, ArrowDownUp, Settings } from 'lucide-react';
 import { useFileStore } from '../../stores/fileStore';
 import { useUIStore } from '../../stores/uiStore';
 import { useEditorStore } from '../../stores/editorStore';
@@ -19,7 +19,11 @@ const formatButtons = [
   { icon: Minus, action: 'hr', label: '分割线', shortcut: 'Ctrl+Shift+H' },
 ];
 
-export function Toolbar(): React.JSX.Element {
+interface ToolbarProps {
+  onOpenSettings: () => void;
+}
+
+export function Toolbar({ onOpenSettings }: ToolbarProps): React.JSX.Element {
   const { openFile, saveFile, saveAsFile } = useFileStore();
   const { previewVisible, togglePreview, theme, toggleTheme, sidebarVisible, toggleSidebar, syncScroll, toggleSyncScroll } = useUIStore();
   const { insertText, getSelectedText } = useEditorStore();
@@ -191,6 +195,13 @@ export function Toolbar(): React.JSX.Element {
           data-testid="theme-btn"
         >
           {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+        </button>
+        <button
+          onClick={onOpenSettings}
+          title="设置"
+          data-testid="settings-btn"
+        >
+          <Settings size={18} />
         </button>
       </div>
     </div>

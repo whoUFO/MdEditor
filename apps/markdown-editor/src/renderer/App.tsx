@@ -16,7 +16,7 @@ function App() {
 
   return (
     <>
-      <MainLayout />
+      <MainLayout onOpenSettings={() => setSettingsOpen(true)} />
       <Settings isOpen={settingsOpen} onClose={() => setSettingsOpen(false)} />
     </>
   );
