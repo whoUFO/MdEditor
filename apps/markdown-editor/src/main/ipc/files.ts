@@ -58,10 +58,16 @@ async function detectEncoding(buffer: Buffer): Promise<string> {
   
   console.log(`detectEncoding: Detected "${detected}", normalized to "${normalized}" (confidence: ${result.confidence})`);
   
-  if (result.confidence && result.confidence < 0.5 && buffer.length > 0) {
-    const hasNonASCII = buffer.some(byte => byte > 127);
+  const hasNonASCII = buffer.some(byte => byte > 127);
+  
+  if (normalized === 'ascii' && hasNonASCII) {
+    console.log('detectEncoding: Detected ASCII but buffer contains non-ASCII bytes, using utf-8');
+    return 'utf-8';
+  }
+  
+  if (result.confidence && result.confidence < 0.5) {
     if (hasNonASCII) {
-      console.log(`detectEncoding: Low confidence but has non-ASCII, using ${normalized}`);
+      console.log(`detectEncoding: Low confidence (${result.confidence}) but has non-ASCII, using ${normalized}`);
       return normalized;
     }
     console.log('detectEncoding: Low confidence and no non-ASCII, using utf-8');
@@ -69,38 +75,6 @@ async function detectEncoding(buffer: Buffer): Promise<string> {
   }
   
   return normalized;
-}
-
-async function verifySave(filePath: string, content: string, encoding: string): Promise<boolean> {
-  try {
-    const savedBuffer = await fs.readFile(filePath);
-    const detectedEncoding = await detectEncoding(savedBuffer);
-    const savedContent = iconv.decode(savedBuffer, detectedEncoding);
-    
-    if (savedContent === content) {
-      console.log(`verifySave: File saved correctly with encoding "${detectedEncoding}"`);
-      return true;
-    } else {
-      console.warn(`verifySave: Content mismatch detected. Trying fallback...`);
-      
-      const normalizedEncoding = normalizeEncoding(encoding);
-      const fallbackContent = iconv.decode(savedBuffer, normalizedEncoding);
-      
-      if (fallbackContent === content) {
-        console.log(`verifySave: Content matches with fallback encoding "${normalizedEncoding}"`);
-        return true;
-      }
-      
-      console.error(`verifySave: Content verification failed!`);
-      console.error(`Original length: ${content.length}, Saved length: ${savedContent.length}`);
-      console.error(`First 50 chars original: "${content.substring(0, 50)}"`);
-      console.error(`First 50 chars saved: "${savedContent.substring(0, 50)}"`);
-      return false;
-    }
-  } catch (error) {
-    console.error(`verifySave: Verification failed with error: ${error}`);
-    return false;
-  }
 }
 
 export function registerFileIPC(): void {
@@ -154,13 +128,21 @@ export function registerFileIPC(): void {
 
   ipcMain.handle('files:save', async (_, filePath: string, content: string, encoding: string) => {
     try {
-      const normalizedEncoding = normalizeEncoding(encoding);
-      const buffer = iconv.encode(content, normalizedEncoding);
+      let finalEncoding = normalizeEncoding(encoding);
+      
+      if (finalEncoding === 'ascii') {
+        const hasNonASCII = content.split('').some(char => char.charCodeAt(0) > 127);
+        if (hasNonASCII) {
+          console.log(`files:save: Content contains non-ASCII characters, changing encoding from ASCII to UTF-8`);
+          finalEncoding = 'utf-8';
+        }
+      }
+      
+      const buffer = iconv.encode(content, finalEncoding);
       await fs.writeFile(filePath, buffer);
       
-      console.log(`files:save: ${filePath}, original encoding: ${encoding}, normalized: ${normalizedEncoding}, buffer length: ${buffer.length}`);
-      
-      await verifySave(filePath, content, normalizedEncoding);
+      console.log(`files:save: ${filePath}, encoding: ${finalEncoding}, buffer length: ${buffer.length}`);
+      console.log(`files:save: Success`);
       
       return true;
     } catch (error) {
@@ -184,13 +166,21 @@ export function registerFileIPC(): void {
     }
 
     try {
-      const normalizedEncoding = normalizeEncoding(encoding);
-      const buffer = iconv.encode(content, normalizedEncoding);
+      let finalEncoding = normalizeEncoding(encoding);
+      
+      if (finalEncoding === 'ascii') {
+        const hasNonASCII = content.split('').some(char => char.charCodeAt(0) > 127);
+        if (hasNonASCII) {
+          console.log(`files:saveAs: Content contains non-ASCII characters, changing encoding from ASCII to UTF-8`);
+          finalEncoding = 'utf-8';
+        }
+      }
+      
+      const buffer = iconv.encode(content, finalEncoding);
       await fs.writeFile(filePath, buffer);
       
-      console.log(`files:saveAs: ${filePath}, original encoding: ${encoding}, normalized: ${normalizedEncoding}, buffer length: ${buffer.length}`);
-      
-      await verifySave(filePath, content, normalizedEncoding);
+      console.log(`files:saveAs: ${filePath}, encoding: ${finalEncoding}, buffer length: ${buffer.length}`);
+      console.log(`files:saveAs: Success`);
       
       return filePath;
     } catch (error) {
