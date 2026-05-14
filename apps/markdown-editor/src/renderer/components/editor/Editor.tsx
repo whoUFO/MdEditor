@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { EditorView } from '@codemirror/view';
+import { EditorView, lineNumbers } from '@codemirror/view';
 import { basicSetup } from 'codemirror';
 import { markdown, markdownLanguage } from '@codemirror/lang-markdown';
 import { languages } from '@codemirror/language-data';
@@ -19,14 +19,13 @@ export function Editor(): React.JSX.Element {
   const viewRef = useRef<EditorView | null>(null);
   const { content, setContent, setCursorPosition, setSelection } = useEditorStore();
   const { syncScroll } = useUIStore();
-  const { wordWrap } = useSettingsStore();
+  const { wordWrap, lineNumbers: showLineNumbers } = useSettingsStore();
   const isSyncingRef = useRef(false);
 
   useEffect(() => {
     if (!editorRef.current) return;
 
     const extensions = [
-      basicSetup,
       markdown({ base: markdownLanguage, codeLanguages: languages }),
       EditorView.updateListener.of((update) => {
         if (update.docChanged) {
@@ -51,6 +50,10 @@ export function Editor(): React.JSX.Element {
         }
       }),
     ];
+
+    if (showLineNumbers) {
+      extensions.push(lineNumbers());
+    }
 
     if (wordWrap) {
       extensions.push(EditorView.lineWrapping);
@@ -87,7 +90,7 @@ export function Editor(): React.JSX.Element {
       view.destroy();
       window.syncEditorScroll = undefined;
     };
-  }, [syncScroll, wordWrap]);
+  }, [syncScroll, wordWrap, showLineNumbers]);
 
   useEffect(() => {
     if (viewRef.current && viewRef.current.state.doc.toString() !== content) {
