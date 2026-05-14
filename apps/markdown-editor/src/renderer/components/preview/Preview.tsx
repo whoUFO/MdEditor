@@ -30,10 +30,10 @@ export function Preview(): React.JSX.Element {
     });
 
     const handleScroll = () => {
-      if (!isSyncingRef.current && (window as any).syncEditorScroll) {
+      if (!isSyncingRef.current && window.syncEditorScroll) {
         const scrollHeight = previewEl.scrollHeight - previewEl.clientHeight;
         const scrollPercent = scrollHeight > 0 ? previewEl.scrollTop / scrollHeight : 0;
-        (window as any).syncEditorScroll(scrollPercent);
+        window.syncEditorScroll(scrollPercent);
       }
     };
 
@@ -46,9 +46,10 @@ export function Preview(): React.JSX.Element {
   }, []);
 
   return (
-    <div 
+    <div
       ref={previewRef}
       className="preview"
+      data-testid="preview-container"
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );

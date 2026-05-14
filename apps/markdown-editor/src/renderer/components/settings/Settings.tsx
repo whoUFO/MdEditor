@@ -20,11 +20,11 @@ export function Settings({ isOpen, onClose }: SettingsProps): React.JSX.Element 
   };
 
   return (
-    <div className="settings-overlay" onClick={handleOverlayClick}>
-      <div className="settings-panel">
+    <div className="settings-overlay" onClick={handleOverlayClick} data-testid="settings-overlay">
+      <div className="settings-panel" data-testid="settings-panel">
         <div className="settings-header">
           <h2>设置</h2>
-          <button className="settings-close" onClick={onClose}>
+          <button className="settings-close" onClick={onClose} data-testid="settings-close">
             <X size={20} />
           </button>
         </div>
@@ -32,7 +32,7 @@ export function Settings({ isOpen, onClose }: SettingsProps): React.JSX.Element 
         <div className="settings-content">
           <div className="settings-section">
             <h3>外观</h3>
-            
+
             <div className="settings-item">
               <div className="settings-label">
                 <span>深色模式</span>
@@ -41,9 +41,10 @@ export function Settings({ isOpen, onClose }: SettingsProps): React.JSX.Element 
               <div className="settings-control">
                 <button
                   className={`toggle-switch ${settings.theme === 'dark' ? 'active' : ''}`}
-                  onClick={() => settings.updateSettings({ 
-                    theme: settings.theme === 'light' ? 'dark' : 'light' 
+                  onClick={() => settings.updateSettings({
+                    theme: settings.theme === 'light' ? 'dark' : 'light'
                   })}
+                  data-testid="theme-toggle"
                 />
               </div>
             </div>

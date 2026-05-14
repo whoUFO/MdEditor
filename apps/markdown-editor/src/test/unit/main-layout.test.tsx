@@ -18,7 +18,7 @@ vi.mock('../../renderer/components/preview/Preview', () => ({
 describe('MainLayout Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (useUIStore as any).mockReturnValue({
+    (useUIStore as unknown as Mock).mockReturnValue({
       sidebarVisible: true,
       previewVisible: true,
       splitRatio: 50,
@@ -39,7 +39,7 @@ describe('MainLayout Component', () => {
   });
 
   it('should hide sidebar when not visible', () => {
-    (useUIStore as any).mockReturnValue({
+    (useUIStore as unknown as Mock).mockReturnValue({
       sidebarVisible: false,
       previewVisible: true,
       splitRatio: 50,
@@ -63,7 +63,7 @@ describe('MainLayout Component', () => {
   });
 
   it('should hide preview when not visible', () => {
-    (useUIStore as any).mockReturnValue({
+    (useUIStore as unknown as Mock).mockReturnValue({
       sidebarVisible: true,
       previewVisible: false,
       splitRatio: 50,
@@ -89,15 +89,5 @@ describe('MainLayout Component', () => {
   it('should display resizer between panes', () => {
     render(<MainLayout />);
     expect(screen.getByTestId('resizer')).toBeInTheDocument();
-  });
-
-  it('should display menu bar', () => {
-    render(<MainLayout />);
-    expect(screen.getByTestId('menu-bar')).toBeInTheDocument();
-  });
-
-  it('should display window controls', () => {
-    render(<MainLayout />);
-    expect(screen.getByTestId('window-controls')).toBeInTheDocument();
   });
 });

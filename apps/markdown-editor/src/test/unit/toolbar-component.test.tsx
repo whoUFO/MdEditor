@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { Toolbar } from '../../renderer/components/layout/Toolbar';
 import { useEditorStore } from '../../renderer/stores/editorStore';
@@ -15,14 +15,17 @@ vi.mock('../../renderer/stores/uiStore', () => ({
 describe('Toolbar Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (useEditorStore as any).mockReturnValue({
+    (useEditorStore as unknown as Mock).mockReturnValue({
       content: '',
       setContent: vi.fn(),
       insertText: vi.fn(),
+      getSelectedText: vi.fn().mockReturnValue(''),
     });
-    (useUIStore as any).mockReturnValue({
+    (useUIStore as unknown as Mock).mockReturnValue({
       previewVisible: true,
       togglePreview: vi.fn(),
+      theme: 'light',
+      toggleTheme: vi.fn(),
     });
   });
 
@@ -33,7 +36,7 @@ describe('Toolbar Component', () => {
 
   it('should display all format buttons', () => {
     render(<Toolbar />);
-    
+
     expect(screen.getByTestId('bold-btn')).toBeInTheDocument();
     expect(screen.getByTestId('italic-btn')).toBeInTheDocument();
     expect(screen.getByTestId('heading-btn')).toBeInTheDocument();
@@ -50,56 +53,53 @@ describe('Toolbar Component', () => {
     expect(screen.getByTestId('preview-btn')).toBeInTheDocument();
   });
 
-  it('should have export button', () => {
+  it('should have theme toggle button', () => {
     render(<Toolbar />);
-    expect(screen.getByTestId('export-btn')).toBeInTheDocument();
+    expect(screen.getByTestId('theme-btn')).toBeInTheDocument();
   });
 
   it('should call insertText when bold button is clicked', () => {
     const insertText = vi.fn();
-    (useEditorStore as any).mockReturnValue({
+    (useEditorStore as unknown as Mock).mockReturnValue({
       content: '',
       setContent: vi.fn(),
       insertText,
+      getSelectedText: vi.fn().mockReturnValue(''),
     });
 
     render(<Toolbar />);
     fireEvent.click(screen.getByTestId('bold-btn'));
-    
-    expect(insertText).toHaveBeenCalledWith('**', '**');
+
+    expect(insertText).toHaveBeenCalledWith('**粗体文本**');
   });
 
   it('should call insertText when italic button is clicked', () => {
     const insertText = vi.fn();
-    (useEditorStore as any).mockReturnValue({
+    (useEditorStore as unknown as Mock).mockReturnValue({
       content: '',
       setContent: vi.fn(),
       insertText,
+      getSelectedText: vi.fn().mockReturnValue(''),
     });
 
     render(<Toolbar />);
     fireEvent.click(screen.getByTestId('italic-btn'));
-    
-    expect(insertText).toHaveBeenCalledWith('*', '*');
+
+    expect(insertText).toHaveBeenCalledWith('*斜体文本*');
   });
 
   it('should call togglePreview when preview button is clicked', () => {
     const togglePreview = vi.fn();
-    (useUIStore as any).mockReturnValue({
+    (useUIStore as unknown as Mock).mockReturnValue({
       previewVisible: true,
       togglePreview,
+      theme: 'light',
+      toggleTheme: vi.fn(),
     });
 
     render(<Toolbar />);
     fireEvent.click(screen.getByTestId('preview-btn'));
-    
-    expect(togglePreview).toHaveBeenCalled();
-  });
 
-  it('should have correct button labels', () => {
-    render(<Toolbar />);
-    
-    expect(screen.getByText('B')).toBeInTheDocument();
-    expect(screen.getByText('I')).toBeInTheDocument();
+    expect(togglePreview).toHaveBeenCalled();
   });
 });

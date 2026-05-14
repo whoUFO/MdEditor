@@ -10,7 +10,7 @@ vi.mock('../../renderer/stores/editorStore', () => ({
 describe('Editor Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (useEditorStore as any).mockReturnValue({
+    (useEditorStore as unknown as Mock).mockReturnValue({
       content: '',
       cursorPosition: { line: 1, column: 1 },
       setContent: vi.fn(),
@@ -29,7 +29,7 @@ describe('Editor Component', () => {
   });
 
   it('should render content', () => {
-    (useEditorStore as any).mockReturnValue({
+    (useEditorStore as unknown as Mock).mockReturnValue({
       content: 'Test content',
       cursorPosition: { line: 1, column: 1 },
       setContent: vi.fn(),
@@ -41,7 +41,7 @@ describe('Editor Component', () => {
   });
 
   it('should show line numbers when enabled', () => {
-    (useEditorStore as any).mockReturnValue({
+    (useEditorStore as unknown as Mock).mockReturnValue({
       content: 'Test content',
       cursorPosition: { line: 1, column: 1 },
       lineNumbers: true,
@@ -54,7 +54,7 @@ describe('Editor Component', () => {
   });
 
   it('should apply custom font size', () => {
-    (useEditorStore as any).mockReturnValue({
+    (useEditorStore as unknown as Mock).mockReturnValue({
       content: '',
       cursorPosition: { line: 1, column: 1 },
       fontSize: 18,
@@ -69,7 +69,7 @@ describe('Editor Component', () => {
 
   it('should handle text input', async () => {
     const setContent = vi.fn();
-    (useEditorStore as any).mockReturnValue({
+    (useEditorStore as unknown as Mock).mockReturnValue({
       content: '',
       cursorPosition: { line: 1, column: 1 },
       setContent,
@@ -84,7 +84,7 @@ describe('Editor Component', () => {
   });
 
   it('should apply word wrap when enabled', () => {
-    (useEditorStore as any).mockReturnValue({
+    (useEditorStore as unknown as Mock).mockReturnValue({
       content: '',
       cursorPosition: { line: 1, column: 1 },
       wordWrap: true,

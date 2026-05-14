@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from 'react';
-import { EditorView, basicSetup } from 'codemirror';
+import { EditorView } from '@codemirror/view';
+import { basicSetup } from 'codemirror';
 import { markdown, markdownLanguage } from '@codemirror/lang-markdown';
 import { languages } from '@codemirror/language-data';
-import { EditorSelection } from '@codemirror/state';
 import { useEditorStore } from '../../stores/editorStore';
 import './Editor.css';
 
@@ -65,7 +65,7 @@ export function Editor(): React.JSX.Element {
       });
     }
 
-    (window as any).syncEditorScroll = (percent: number) => {
+    window.syncEditorScroll = (percent: number) => {
       isSyncingRef.current = true;
       const scrollEl = view.scrollDOM;
       if (scrollEl) {
@@ -79,7 +79,7 @@ export function Editor(): React.JSX.Element {
 
     return () => {
       view.destroy();
-      (window as any).syncEditorScroll = undefined;
+      window.syncEditorScroll = undefined;
     };
   }, []);
 

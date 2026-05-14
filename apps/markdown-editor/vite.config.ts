@@ -14,7 +14,10 @@ export default defineConfig({
           build: {
             outDir: 'dist/main',
             rollupOptions: {
-              external: ['electron'],
+              external: ['electron', 'path', 'fs'],
+              output: {
+                format: 'es',
+              },
             },
           },
         },
@@ -41,21 +44,16 @@ export default defineConfig({
       '@shared': path.resolve(__dirname, '../../packages/shared/src'),
     },
   },
-  root: '.',
+  root: 'src/renderer',
   build: {
-    outDir: 'dist/renderer',
+    outDir: '../../dist/renderer',
     emptyOutDir: true,
     rollupOptions: {
       output: {
-        manualChunks: {
-          codemirror: [
-            '@codemirror/state',
-            '@codemirror/view',
-            '@codemirror/commands',
-            '@codemirror/lang-markdown',
-          ],
-          markdown: ['unified', 'remark-parse', 'remark-rehype', 'rehype-stringify'],
-          vendor: ['react', 'react-dom', 'zustand'],
+        manualChunks(id) {
+          if (id.includes('codemirror')) return 'codemirror';
+          if (id.includes('unified') || id.includes('remark') || id.includes('rehype')) return 'markdown';
+          if (id.includes('react') || id.includes('react-dom') || id.includes('zustand')) return 'vendor';
         },
       },
     },

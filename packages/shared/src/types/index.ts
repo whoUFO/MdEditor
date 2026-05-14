@@ -61,6 +61,7 @@ export interface ElectronAPI {
     getPlatform: () => Promise<string>;
   };
   printToPDF: () => Promise<void>;
+  exportToPDF: (html: string, fileName: string) => Promise<void>;
 }
 
 declare global {

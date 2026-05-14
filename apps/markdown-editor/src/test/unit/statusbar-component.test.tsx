@@ -15,12 +15,11 @@ vi.mock('../../renderer/stores/fileStore', () => ({
 describe('StatusBar Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (useEditorStore as any).mockReturnValue({
+    (useEditorStore as unknown as Mock).mockReturnValue({
       content: 'Test content',
-      cursorPosition: { line: 1, column: 1 },
-      wordCount: 2,
+      isDirty: false,
     });
-    (useFileStore as any).mockReturnValue({
+    (useFileStore as unknown as Mock).mockReturnValue({
       currentFile: null,
     });
   });
@@ -30,26 +29,27 @@ describe('StatusBar Component', () => {
     expect(screen.getByTestId('status-bar')).toBeInTheDocument();
   });
 
-  it('should display line number', () => {
+  it('should display file name or untitled', () => {
     render(<StatusBar />);
-    expect(screen.getByText(/Ln 1/)).toBeInTheDocument();
-  });
-
-  it('should display column number', () => {
-    render(<StatusBar />);
-    expect(screen.getByText(/Col 1/)).toBeInTheDocument();
+    expect(screen.getByText('未命名')).toBeInTheDocument();
   });
 
   it('should display word count', () => {
     render(<StatusBar />);
-    expect(screen.getByText(/Words/)).toBeInTheDocument();
+    expect(screen.getByText(/字/)).toBeInTheDocument();
+  });
+
+  it('should display line count', () => {
+    render(<StatusBar />);
+    expect(screen.getByText(/行/)).toBeInTheDocument();
   });
 
   it('should show filename when file is open', () => {
-    (useFileStore as any).mockReturnValue({
+    (useFileStore as unknown as Mock).mockReturnValue({
       currentFile: {
         name: 'test.md',
         path: '/path/to/test.md',
+        encoding: 'UTF-8',
       },
     });
 
@@ -57,24 +57,28 @@ describe('StatusBar Component', () => {
     expect(screen.getByText('test.md')).toBeInTheDocument();
   });
 
-  it('should show "Untitled" when no file is open', () => {
-    (useFileStore as any).mockReturnValue({
-      currentFile: null,
+  it('should show dirty indicator when content is dirty', () => {
+    (useEditorStore as unknown as Mock).mockReturnValue({
+      content: 'Modified content',
+      isDirty: true,
     });
 
     render(<StatusBar />);
-    expect(screen.getByText('Untitled')).toBeInTheDocument();
+    expect(document.querySelector('.dirty-indicator')).toBeInTheDocument();
   });
 
-  it('should update when cursor position changes', () => {
-    (useEditorStore as any).mockReturnValue({
-      content: 'Test content',
-      cursorPosition: { line: 5, column: 10 },
-      wordCount: 2,
-    });
-
+  it('should display theme', () => {
     render(<StatusBar />);
-    expect(screen.getByText(/Ln 5/)).toBeInTheDocument();
-    expect(screen.getByText(/Col 10/)).toBeInTheDocument();
+    expect(screen.getByText(/明亮|暗黑/)).toBeInTheDocument();
+  });
+
+  it('should display version', () => {
+    render(<StatusBar />);
+    expect(screen.getByText('v0.1.0')).toBeInTheDocument();
+  });
+
+  it('should display encoding', () => {
+    render(<StatusBar />);
+    expect(screen.getByText('UTF-8')).toBeInTheDocument();
   });
 });

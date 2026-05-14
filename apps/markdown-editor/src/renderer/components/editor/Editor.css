@@ -5,92 +5,92 @@
   font-size: var(--font-size-md);
 }
 
-.editor :deep(.cm-editor) {
+.editor .cm-editor {
   height: 100%;
 }
 
-.editor :deep(.cm-scroller) {
+.editor .cm-scroller {
   overflow: auto;
 }
 
-.editor :deep(.cm-content) {
+.editor .cm-content {
   padding: var(--spacing-md);
 }
 
-.editor :deep(.cm-line) {
+.editor .cm-line {
   min-height: 24px;
 }
 
-.editor :deep(.cm-cursor) {
+.editor .cm-cursor {
   border-color: var(--editor-cursor);
 }
 
-.editor :deep(.cm-selectionBackground) {
+.editor .cm-selectionBackground {
   background-color: var(--editor-selection);
 }
 
-.editor :deep(.cm-activeLine) {
+.editor .cm-activeLine {
   background-color: rgba(0, 0, 0, 0.03);
 }
 
-.editor :deep(.cm-lineNumbers .cm-gutters) {
+.editor .cm-lineNumbers .cm-gutters {
   background-color: var(--color-bg-secondary);
   border-right: 1px solid var(--color-border);
 }
 
-.editor :deep(.cm-lineNumbers .cm-lineNumber) {
+.editor .cm-lineNumbers .cm-lineNumber {
   color: var(--editor-line-number);
   padding: 0 var(--spacing-sm);
 }
 
-.editor :deep(.cm-header-1) {
+.editor .cm-header-1 {
   font-size: 2em;
   font-weight: bold;
   margin-bottom: var(--spacing-sm);
 }
 
-.editor :deep(.cm-header-2) {
+.editor .cm-header-2 {
   font-size: 1.5em;
   font-weight: bold;
   margin-bottom: var(--spacing-sm);
 }
 
-.editor :deep(.cm-header-3) {
+.editor .cm-header-3 {
   font-size: 1.25em;
   font-weight: bold;
   margin-bottom: var(--spacing-sm);
 }
 
-.editor :deep(.cm-strong) {
+.editor .cm-strong {
   font-weight: bold;
 }
 
-.editor :deep(.cm-em) {
+.editor .cm-em {
   font-style: italic;
 }
 
-.editor :deep(.cm-link) {
+.editor .cm-link {
   color: var(--preview-link);
   text-decoration: underline;
 }
 
-.editor :deep(.cm-strikethrough) {
+.editor .cm-strikethrough {
   text-decoration: line-through;
 }
 
-.editor :deep(.cm-comment) {
+.editor .cm-comment {
   color: var(--color-text-tertiary);
   font-style: italic;
 }
 
-.editor :deep(.cm-string) {
+.editor .cm-string {
   color: var(--color-success);
 }
 
-.editor :deep(.cm-keyword) {
+.editor .cm-keyword {
   color: var(--color-accent);
 }
 
-.editor :deep(.cm-variable-2) {
+.editor .cm-variable-2 {
   color: var(--color-warning);
 }

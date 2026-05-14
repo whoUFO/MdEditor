@@ -10,7 +10,7 @@ vi.mock('../../renderer/stores/settingsStore', () => ({
 describe('Settings Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (useSettingsStore as any).mockReturnValue({
+    (useSettingsStore as unknown as Mock).mockReturnValue({
       theme: 'light',
       fontSize: 14,
       lineNumbers: true,
@@ -72,7 +72,7 @@ describe('Settings Component', () => {
 
   it('should toggle theme when theme button is clicked', () => {
     const updateSettings = vi.fn();
-    (useSettingsStore as any).mockReturnValue({
+    (useSettingsStore as unknown as Mock).mockReturnValue({
       theme: 'light',
       fontSize: 14,
       lineNumbers: true,
@@ -93,7 +93,7 @@ describe('Settings Component', () => {
 
   it('should increase font size when plus button is clicked', () => {
     const updateSettings = vi.fn();
-    (useSettingsStore as any).mockReturnValue({
+    (useSettingsStore as unknown as Mock).mockReturnValue({
       theme: 'light',
       fontSize: 14,
       lineNumbers: true,
@@ -114,7 +114,7 @@ describe('Settings Component', () => {
 
   it('should decrease font size when minus button is clicked', () => {
     const updateSettings = vi.fn();
-    (useSettingsStore as any).mockReturnValue({
+    (useSettingsStore as unknown as Mock).mockReturnValue({
       theme: 'light',
       fontSize: 14,
       lineNumbers: true,

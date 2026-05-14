@@ -73,16 +73,14 @@ export function RecentFiles(): React.JSX.Element {
   }, [openFile]);
 
   const handleRemoveFile = useCallback((path: string) => {
-    useFileStore.setState((state) => ({
-      recentFiles: state.recentFiles.filter((f) => f.path !== path),
-    }));
-  }, []);
+    removeRecentFile(path);
+  }, [removeRecentFile]);
 
   const handleClearAll = useCallback(() => {
     if (recentFiles.length > 0) {
-      useFileStore.setState({ recentFiles: [] });
+      clearRecentFiles();
     }
-  }, [recentFiles.length]);
+  }, [recentFiles.length, clearRecentFiles]);
 
   return (
     <div className="recent-files">

@@ -20,6 +20,7 @@ const electronAPI: ElectronAPI = {
     getPlatform: () => ipcRenderer.invoke('app:getPlatform'),
   },
   printToPDF: () => ipcRenderer.invoke('print:pdf'),
+  exportToPDF: (html: string, fileName: string) => ipcRenderer.invoke('export:pdf', html, fileName),
 };
 
 contextBridge.exposeInMainWorld('electronAPI', electronAPI);
