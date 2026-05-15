@@ -1,0 +1,11 @@
+{
+  "extends": "@markdown-editor/tsconfig/base.json",
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "jsx": "react-jsx",
+    "moduleResolution": "bundler",
+    "ignoreDeprecations": "6.0"
+  },
+  "include": ["src/**/*"]
+}

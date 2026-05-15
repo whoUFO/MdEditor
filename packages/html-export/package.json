@@ -1,0 +1,44 @@
+{
+  "name": "@markdown-editor/html-export",
+  "version": "0.1.0",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js",
+    "./templates": "./dist/templates/index.js",
+    "./utils": "./dist/utils/index.js",
+    "./components": "./dist/components/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts,.tsx",
+    "test": "vitest",
+    "test:unit": "vitest run"
+  },
+  "dependencies": {
+    "marked": "^15.0.0",
+    "dompurify": "^3.0.0",
+    "jsdom": "^26.0.0"
+  },
+  "peerDependencies": {
+    "react": ">=17.0.0",
+    "react-dom": ">=17.0.0"
+  },
+  "devDependencies": {
+    "@markdown-editor/tsconfig": "workspace:*",
+    "@testing-library/jest-dom": "^6.0.0",
+    "@testing-library/react": "^14.0.0",
+    "@types/dompurify": "^3.0.0",
+    "@types/jsdom": "^21.0.0",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "typescript": "^6.0.0",
+    "vitest": "^3.0.0"
+  }
+}
