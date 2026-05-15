@@ -1,9 +1,12 @@
 import DOMPurify from 'dompurify';
 import { JSDOM } from 'jsdom';
-import { ExportConfig, ExportResult, ExportTemplate } from './types';
+import { ExportConfig, ExportResult, ExportTemplate, TemplateOptions } from './types';
 import { TemplateEngine } from './engine';
 import { TOCHelper } from './toc';
 import { ALL_TEMPLATES, DEFAULT_EXPORT_TEMPLATE } from './templates';
+
+const isBrowser = typeof window !== 'undefined';
+const isNode = typeof process !== 'undefined' && process.versions?.node;
 
 export class HTMLExporter {
   private templates: Map<string, ExportTemplate>;
@@ -25,6 +28,11 @@ export class HTMLExporter {
     return this.templates.get(id);
   }
 
+  getDefaultOptions(templateId: string): TemplateOptions | undefined {
+    const template = this.templates.get(templateId);
+    return template?.defaultOptions;
+  }
+
   async export(renderedHTML: string, config: ExportConfig): Promise<ExportResult> {
     try {
       const template = this.templates.get(config.templateId) || DEFAULT_EXPORT_TEMPLATE;
@@ -40,7 +48,7 @@ export class HTMLExporter {
         date: config.variables?.date || new Date().toISOString().split('T')[0],
         author: config.variables?.author || '',
         toc: tocHTML,
-        style: '', // TemplateEngine will replace this
+        style: '',
       };
 
       const html = TemplateEngine.renderFull(template.template, variables, options);
@@ -63,21 +71,76 @@ export class HTMLExporter {
   }
 
   download(html: string, filename = 'export.html'): void {
+    if (!isBrowser) {
+      console.warn('download() is only available in browser environment');
+      return;
+    }
+
     const blob = new Blob([html], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
     link.download = filename;
+    document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
     URL.revokeObjectURL(url);
   }
 
-  preview(html: string): void {
-    const win = window.open('', '_blank');
+  preview(html: string, title = 'Preview'): void {
+    if (!isBrowser) {
+      console.warn('preview() is only available in browser environment');
+      return;
+    }
+
+    const win = window.open('', '_blank', 'width=1200,height=800');
     if (win) {
       win.document.write(html);
+      win.document.title = title;
       win.document.close();
     }
+  }
+
+  async saveFile(html: string, filepath: string): Promise<boolean> {
+    if (!isNode) {
+      console.warn('saveFile() is only available in Node.js environment');
+      return false;
+    }
+
+    try {
+      const fs = await import('fs/promises');
+      await fs.writeFile(filepath, html, 'utf-8');
+      return true;
+    } catch (error) {
+      console.error('Failed to save file:', error);
+      return false;
+    }
+  }
+
+  async getHTMLAsDataUrl(html: string): Promise<string> {
+    const blob = new Blob([html], { type: 'text/html' });
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  getExportInfo(): {
+    templateCount: number;
+    templateIds: string[];
+    supportedThemes: string[];
+    isBrowser: boolean;
+    isNode: boolean;
+  } {
+    return {
+      templateCount: this.templates.size,
+      templateIds: Array.from(this.templates.keys()),
+      supportedThemes: ['light', 'dark', 'custom'],
+      isBrowser,
+      isNode: Boolean(isNode),
+    };
   }
 
   private sanitize(html: string): string {

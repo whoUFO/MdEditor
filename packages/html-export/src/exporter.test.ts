@@ -160,6 +160,130 @@ describe('HTMLExporter', () => {
     expect(result.success).toBe(true);
     expect(result.html).toContain('#111827');
   });
+
+  it('should get default options', () => {
+    const exporter = new HTMLExporter();
+    const options = exporter.getDefaultOptions('minimal');
+    expect(options).toBeDefined();
+    expect(options?.showTOC).toBe(false);
+  });
+
+  it('should return undefined for unknown template default options', () => {
+    const exporter = new HTMLExporter();
+    const options = exporter.getDefaultOptions('nonexistent');
+    expect(options).toBeUndefined();
+  });
+
+  it('should get export info', () => {
+    const exporter = new HTMLExporter();
+    const info = exporter.getExportInfo();
+    expect(info.templateCount).toBeGreaterThanOrEqual(5);
+    expect(info.templateIds).toContain('default');
+    expect(info.templateIds).toContain('minimal');
+    expect(info.supportedThemes).toContain('light');
+    expect(info.supportedThemes).toContain('dark');
+  });
+
+  it('should return error for invalid export', async () => {
+    const exporter = new HTMLExporter();
+    const result = await exporter.export('', {
+      templateId: 'nonexistent',
+      options: {},
+    });
+    expect(result.success).toBe(true);
+    expect(result.html).toBeDefined();
+  });
+
+  it('should merge custom options with defaults', async () => {
+    const exporter = new HTMLExporter();
+    const result = await exporter.export('<h1>Test</h1>', {
+      templateId: 'minimal',
+      options: {
+        fontSize: 20,
+        fontFamily: 'Custom Font',
+      },
+      variables: { title: 'Custom Test' },
+    });
+    expect(result.success).toBe(true);
+    expect(result.metadata?.options.fontSize).toBe(20);
+    expect(result.metadata?.options.fontFamily).toBe('Custom Font');
+    expect(result.html).toContain('Custom Font');
+  });
+
+  it('should include metadata in result', async () => {
+    const exporter = new HTMLExporter();
+    const result = await exporter.export('<h1>Test</h1>', {
+      templateId: 'default',
+      options: {},
+      variables: { title: 'Metadata Test' },
+    });
+    expect(result.success).toBe(true);
+    expect(result.metadata).toBeDefined();
+    expect(result.metadata?.templateId).toBe('default');
+    expect(result.metadata?.generatedAt).toBeDefined();
+    expect(result.metadata?.options).toBeDefined();
+  });
+
+  it('should handle missing title gracefully', async () => {
+    const exporter = new HTMLExporter();
+    const result = await exporter.export('<h1>Test</h1>', {
+      templateId: 'default',
+      options: {},
+    });
+    expect(result.success).toBe(true);
+    expect(result.html).toContain('Untitled');
+  });
+
+  it('should handle missing author gracefully', async () => {
+    const exporter = new HTMLExporter();
+    const result = await exporter.export('<h1>Test</h1>', {
+      templateId: 'documentation',
+      options: {},
+      variables: { title: 'Test' },
+    });
+    expect(result.success).toBe(true);
+    expect(result.html).not.toContain('By undefined');
+  });
+
+  it('should export with TOC enabled', async () => {
+    const exporter = new HTMLExporter();
+    const result = await exporter.export(
+      '<h1 id="title">Title</h1><h2 id="section">Section</h2>',
+      {
+        templateId: 'default',
+        options: { showTOC: true },
+        variables: { title: 'TOC Test' },
+      }
+    );
+    expect(result.success).toBe(true);
+    expect(result.html).toContain('<nav class="toc">');
+    expect(result.html).toContain('href="#title"');
+  });
+
+  it('should export without TOC when disabled', async () => {
+    const exporter = new HTMLExporter();
+    const result = await exporter.export(
+      '<h1 id="title">Title</h1><h2 id="section">Section</h2>',
+      {
+        templateId: 'minimal',
+        options: { showTOC: false },
+        variables: { title: 'No TOC Test' },
+      }
+    );
+    expect(result.success).toBe(true);
+    expect(result.html).not.toContain('<nav class="toc">');
+  });
+
+  it('should export with print optimized styles', async () => {
+    const exporter = new HTMLExporter();
+    const result = await exporter.export('<h1>Test</h1>', {
+      templateId: 'print',
+      options: { printOptimized: true },
+      variables: { title: 'Print Optimized' },
+    });
+    expect(result.success).toBe(true);
+    expect(result.html).toContain('@media print');
+  });
 });
 
 describe('ALL_TEMPLATES', () => {
@@ -179,5 +303,11 @@ describe('ALL_TEMPLATES', () => {
       expect(template.template).toBeTruthy();
       expect(template.defaultOptions).toBeTruthy();
     });
+  });
+
+  it('should have unique template IDs', () => {
+    const ids = ALL_TEMPLATES.map(t => t.id);
+    const uniqueIds = new Set(ids);
+    expect(uniqueIds.size).toBe(ids.length);
   });
 });
