@@ -1,54 +1,15 @@
 import DOMPurify from 'dompurify';
 import { JSDOM } from 'jsdom';
 import { ExportConfig, ExportResult, ExportTemplate } from './types';
-import { TEMPLATE_IDS } from './constants';
 import { TemplateEngine } from './engine';
 import { TOCHelper } from './toc';
-
-const DEFAULT_TEMPLATE = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>{{title}}</title>
-  <style>{{style}}</style>
-</head>
-<body>
-  <article>
-    {{#if showTOC}}
-    <nav class="toc">{{toc}}</nav>
-    {{/if}}
-    <div class="content">{{{content}}}</div>
-  </article>
-</body>
-</html>
-`;
-
-const DEFAULT_EXPORT_TEMPLATE: ExportTemplate = {
-  id: TEMPLATE_IDS.DEFAULT,
-  name: 'Default Template',
-  description: 'Simple and clean HTML export template',
-  template: DEFAULT_TEMPLATE,
-  defaultOptions: {
-    theme: 'light',
-    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-    fontSize: 16,
-    lineHeight: 1.6,
-    maxWidth: '800px',
-    showTOC: true,
-    showPageNumbers: false,
-    printOptimized: false,
-    highlightTheme: 'github',
-    mathEnabled: false,
-  },
-};
+import { ALL_TEMPLATES, DEFAULT_EXPORT_TEMPLATE } from './templates';
 
 export class HTMLExporter {
   private templates: Map<string, ExportTemplate>;
 
-  constructor(templates: ExportTemplate[] = []) {
+  constructor(templates: ExportTemplate[] = ALL_TEMPLATES) {
     this.templates = new Map();
-    this.registerTemplate(DEFAULT_EXPORT_TEMPLATE);
     templates.forEach(t => this.registerTemplate(t));
   }
 
@@ -79,7 +40,7 @@ export class HTMLExporter {
         date: config.variables?.date || new Date().toISOString().split('T')[0],
         author: config.variables?.author || '',
         toc: tocHTML,
-        style: '',
+        style: '', // TemplateEngine will replace this
       };
 
       const html = TemplateEngine.renderFull(template.template, variables, options);

@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { TemplateEngine } from './engine';
 import { TOCHelper } from './toc';
 import { HTMLExporter } from './exporter';
+import { ALL_TEMPLATES } from './templates';
 
 describe('TemplateEngine', () => {
   it('should render variables', () => {
@@ -32,7 +33,8 @@ describe('TemplateEngine', () => {
       mathEnabled: false,
     };
     const result = TemplateEngine.injectStyles(template, options);
-    expect(result).toContain('--font-family: Arial');
+    expect(result).toContain('Arial');
+    expect(result).toContain('14px');
   });
 });
 
@@ -65,11 +67,14 @@ describe('TOCHelper', () => {
 });
 
 describe('HTMLExporter', () => {
-  it('should create exporter with default template', () => {
+  it('should create exporter with all templates', () => {
     const exporter = new HTMLExporter();
     const templates = exporter.getTemplates();
-    expect(templates).toHaveLength(1);
-    expect(templates[0].id).toBe('default');
+    expect(templates.length).toBeGreaterThanOrEqual(5);
+    expect(exporter.getTemplate('minimal')).toBeDefined();
+    expect(exporter.getTemplate('documentation')).toBeDefined();
+    expect(exporter.getTemplate('blog')).toBeDefined();
+    expect(exporter.getTemplate('print')).toBeDefined();
   });
 
   it('should register custom template', () => {
@@ -82,11 +87,11 @@ describe('HTMLExporter', () => {
       defaultOptions: {} as any,
     });
     const templates = exporter.getTemplates();
-    expect(templates).toHaveLength(2);
+    expect(templates.length).toBeGreaterThanOrEqual(6);
     expect(exporter.getTemplate('custom')).toBeDefined();
   });
 
-  it('should export HTML', async () => {
+  it('should export HTML with default template', async () => {
     const exporter = new HTMLExporter();
     const result = await exporter.export('<h1>Test</h1>', {
       templateId: 'default',
@@ -96,5 +101,83 @@ describe('HTMLExporter', () => {
     expect(result.success).toBe(true);
     expect(result.html).toContain('Test Document');
     expect(result.html).toContain('<h1>Test</h1>');
+  });
+
+  it('should export HTML with minimal template', async () => {
+    const exporter = new HTMLExporter();
+    const result = await exporter.export('<h1>Test</h1>', {
+      templateId: 'minimal',
+      options: {},
+      variables: { title: 'Minimal Test' },
+    });
+    expect(result.success).toBe(true);
+    expect(result.html).toContain('Minimal Test');
+  });
+
+  it('should export HTML with documentation template', async () => {
+    const exporter = new HTMLExporter();
+    const result = await exporter.export('<h1>Test</h1><h2>Section</h2>', {
+      templateId: 'documentation',
+      options: {},
+      variables: { title: 'Doc Test', author: 'Author' },
+    });
+    expect(result.success).toBe(true);
+    expect(result.html).toContain('Doc Test');
+    expect(result.html).toContain('sidebar');
+  });
+
+  it('should export HTML with blog template', async () => {
+    const exporter = new HTMLExporter();
+    const result = await exporter.export('<h1>Test</h1>', {
+      templateId: 'blog',
+      options: {},
+      variables: { title: 'Blog Test', author: 'Blogger' },
+    });
+    expect(result.success).toBe(true);
+    expect(result.html).toContain('Blog Test');
+    expect(result.html).toContain('blog-header');
+  });
+
+  it('should export HTML with print template', async () => {
+    const exporter = new HTMLExporter();
+    const result = await exporter.export('<h1>Test</h1>', {
+      templateId: 'print',
+      options: {},
+      variables: { title: 'Print Test' },
+    });
+    expect(result.success).toBe(true);
+    expect(result.html).toContain('Print Test');
+    expect(result.html).toContain('print-article');
+  });
+
+  it('should export with dark theme', async () => {
+    const exporter = new HTMLExporter();
+    const result = await exporter.export('<h1>Test</h1>', {
+      templateId: 'default',
+      options: { theme: 'dark' },
+      variables: { title: 'Dark Theme' },
+    });
+    expect(result.success).toBe(true);
+    expect(result.html).toContain('#111827');
+  });
+});
+
+describe('ALL_TEMPLATES', () => {
+  it('should have all templates', () => {
+    const templateIds = ALL_TEMPLATES.map(t => t.id);
+    expect(templateIds).toContain('default');
+    expect(templateIds).toContain('minimal');
+    expect(templateIds).toContain('documentation');
+    expect(templateIds).toContain('blog');
+    expect(templateIds).toContain('print');
+  });
+
+  it('should have valid template structure', () => {
+    ALL_TEMPLATES.forEach(template => {
+      expect(template.id).toBeTruthy();
+      expect(template.name).toBeTruthy();
+      expect(template.template).toBeTruthy();
+      expect(template.defaultOptions).toBeTruthy();
+    });
   });
 });

@@ -1,1 +1,19 @@
 export { DEFAULT_TEMPLATE, DEFAULT_EXPORT_TEMPLATE } from './default';
+export { MINIMAL_TEMPLATE, MINIMAL_EXPORT_TEMPLATE } from './minimal';
+export { DOCUMENTATION_TEMPLATE, DOCUMENTATION_EXPORT_TEMPLATE } from './documentation';
+export { BLOG_TEMPLATE, BLOG_EXPORT_TEMPLATE } from './blog';
+export { PRINT_TEMPLATE, PRINT_EXPORT_TEMPLATE } from './print';
+
+import { DEFAULT_EXPORT_TEMPLATE } from './default';
+import { MINIMAL_EXPORT_TEMPLATE } from './minimal';
+import { DOCUMENTATION_EXPORT_TEMPLATE } from './documentation';
+import { BLOG_EXPORT_TEMPLATE } from './blog';
+import { PRINT_EXPORT_TEMPLATE } from './print';
+
+export const ALL_TEMPLATES = [
+  DEFAULT_EXPORT_TEMPLATE,
+  MINIMAL_EXPORT_TEMPLATE,
+  DOCUMENTATION_EXPORT_TEMPLATE,
+  BLOG_EXPORT_TEMPLATE,
+  PRINT_EXPORT_TEMPLATE,
+];
