@@ -1,0 +1,1 @@
+export { TOCHelper } from '../toc';
