@@ -6,11 +6,14 @@ import { StatusBar } from './StatusBar';
 import { FileTree } from '../file-tree/FileTree';
 import { TOC } from '../toc/TOC';
 import { RecentFiles } from '../recent-files/RecentFiles';
+import { ExportDialog } from '../export/ExportDialog';
 import { useUIStore } from '../../stores/uiStore';
 import { useFileStore } from '../../stores/fileStore';
 import { useEditorStore } from '../../stores/editorStore';
 import { renderMarkdown } from '../../utils/markdown';
 import { FolderOpen, BookOpen, FileText, Download, Clock } from 'lucide-react';
+import { HTMLExporter, ALL_TEMPLATES } from '@markdown-editor/html-export';
+import type { ExportConfig } from '@markdown-editor/html-export';
 import './MainLayout.css';
 
 type SidebarTab = 'files' | 'toc' | 'recent';
@@ -24,6 +27,7 @@ export function MainLayout({ onOpenSettings }: MainLayoutProps): React.JSX.Eleme
   const { currentFile, saveFile } = useFileStore();
   const { content } = useEditorStore();
   const [sidebarTab, setSidebarTab] = useState<SidebarTab>('files');
+  const [exportDialogOpen, setExportDialogOpen] = useState(false);
   
   const containerRef = useRef<HTMLDivElement>(null);
   const isResizingRef = useRef(false);
@@ -63,6 +67,40 @@ export function MainLayout({ onOpenSettings }: MainLayoutProps): React.JSX.Eleme
       document.removeEventListener('mouseup', handleResizeEnd);
     };
   }, []);
+
+  const handleExportWithTemplate = async (config: ExportConfig) => {
+    try {
+      const html = await renderMarkdown(content);
+      const exporter = new HTMLExporter();
+      
+      const result = await exporter.export(html, {
+        ...config,
+        variables: {
+          ...config.variables,
+          content: html,
+          title: currentFile?.name?.replace(/\.md$/, '') || 'Untitled',
+          date: new Date().toLocaleDateString('zh-CN'),
+        },
+      });
+
+      if (result.success && result.html) {
+        exporter.download(result.html, result.filename || 'document.html');
+      } else {
+        console.error('Export failed:', result.error);
+        alert('导出失败：' + (result.error || '未知错误'));
+      }
+    } catch (error) {
+      console.error('Export error:', error);
+      alert('导出失败：' + (error instanceof Error ? error.message : '未知错误'));
+    }
+  };
+
+  const handlePreviewWithTemplate = (templateId: string) => {
+    const template = ALL_TEMPLATES.find(t => t.id === templateId);
+    if (template) {
+      alert(`模板预览: ${template.name}\n\n${template.description}`);
+    }
+  };
 
   const handleExportHTML = async () => {
     const html = await renderMarkdown(content);
@@ -280,6 +318,10 @@ export function MainLayout({ onOpenSettings }: MainLayoutProps): React.JSX.Eleme
         </div>
       </div>
       <div className="export-bar">
+        <button className="export-btn" onClick={() => setExportDialogOpen(true)}>
+          <Download size={14} />
+          <span>高级导出</span>
+        </button>
         <button className="export-btn" onClick={handleExportHTML}>
           <Download size={14} />
           <span>导出 HTML</span>
@@ -289,6 +331,13 @@ export function MainLayout({ onOpenSettings }: MainLayoutProps): React.JSX.Eleme
           <span>导出 PDF</span>
         </button>
       </div>
+      <ExportDialog
+        isOpen={exportDialogOpen}
+        onClose={() => setExportDialogOpen(false)}
+        onExport={handleExportWithTemplate}
+        onPreview={handlePreviewWithTemplate}
+        currentFilename={currentFile?.name}
+      />
       <StatusBar />
     </div>
   );

@@ -30,6 +30,7 @@
     "@codemirror/theme-one-dark": "^6.0.0",
     "@codemirror/view": "^6.0.0",
     "@markdown-editor/shared": "workspace:*",
+    "@markdown-editor/html-export": "workspace:*",
     "codemirror": "^6.0.2",
     "dompurify": "^3.0.0",
     "highlight.js": "^11.0.0",
