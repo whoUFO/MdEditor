@@ -78,13 +78,13 @@ export function Toolbar({ onOpenSettings }: ToolbarProps): React.JSX.Element {
         >
           {sidebarVisible ? <PanelLeftClose size={18} /> : <PanelLeft size={18} />}
         </button>
-        <button onClick={openFile} title="打开文件 (Ctrl+O)" data-testid="open-btn">
+        <button onClick={() => openFile()} title="打开文件 (Ctrl+O)" data-testid="open-btn">
           <FolderOpen size={18} />
         </button>
-        <button onClick={saveFile} title="保存 (Ctrl+S)" data-testid="save-btn">
+        <button onClick={() => saveFile()} title="保存 (Ctrl+S)" data-testid="save-btn">
           <Save size={18} />
         </button>
-        <button onClick={saveAsFile} title="另存为 (Ctrl+Shift+S)" data-testid="save-as-btn">
+        <button onClick={() => saveAsFile()} title="另存为 (Ctrl+Shift+S)" data-testid="save-as-btn">
           <Save size={18} />
         </button>
       </div>
