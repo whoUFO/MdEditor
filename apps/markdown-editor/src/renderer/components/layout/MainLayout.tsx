@@ -104,15 +104,28 @@ export function MainLayout({ onOpenSettings }: MainLayoutProps): React.JSX.Eleme
 
   const handleExportHTML = async () => {
     const html = await renderMarkdown(content);
+    const highlightCSS = `
+      .hljs { display: block; overflow-x: auto; padding: 0.5em; color: #333; background: #f8f8f8; }
+      .hljs-comment, .hljs-quote { color: #998; font-style: italic; }
+      .hljs-keyword, .hljs-selector-tag, .hljs-subst { color: #333; font-weight: bold; }
+      .hljs-number, .hljs-literal { color: #008080; }
+      .hljs-string { color: #d14; }
+      .hljs-title, .hljs-section { color: #900; font-weight: bold; }
+      .hljs-type { color: #458; font-weight: bold; }
+      .hljs-tag { color: #000080; }
+      .hljs-regexp { color: #009926; }
+      .hljs-symbol { color: #990073; }
+      .hljs-built_in { color: #0086b3; }
+      .hljs-meta { color: #999; font-weight: bold; }
+    `;
     const fullHTML = `
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
   <title>${currentFile?.name || 'Document'}</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
   <style>
+    ${highlightCSS}
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       max-width: 800px;
@@ -145,15 +158,28 @@ export function MainLayout({ onOpenSettings }: MainLayoutProps): React.JSX.Eleme
 
   const handleExportPDF = async () => {
     const html = await renderMarkdown(content);
+    const highlightCSS = `
+      .hljs { display: block; overflow-x: auto; padding: 0.5em; color: #333; background: #f8f8fa; }
+      .hljs-comment, .hljs-quote { color: #998; font-style: italic; }
+      .hljs-keyword, .hljs-selector-tag, .hljs-subst { color: #333; font-weight: bold; }
+      .hljs-number, .hljs-literal { color: #008080; }
+      .hljs-string { color: #d14; }
+      .hljs-title, .hljs-section { color: #900; font-weight: bold; }
+      .hljs-type { color: #458; font-weight: bold; }
+      .hljs-tag { color: #000080; }
+      .hljs-regexp { color: #009926; }
+      .hljs-symbol { color: #990073; }
+      .hljs-built_in { color: #0086b3; }
+      .hljs-meta { color: #999; font-weight: bold; }
+    `;
     const fullHTML = `
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
   <title>${currentFile?.name || 'Document'}</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
   <style>
+    ${highlightCSS}
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       max-width: 800px;

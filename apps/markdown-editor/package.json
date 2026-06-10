@@ -83,8 +83,10 @@
       "buildResources": "build"
     },
     "files": [
-      "dist/**/*"
+      "dist/**/*",
+      "package.json"
     ],
+    "asar": true,
     "extraMetadata": {
       "main": "dist/main/index.js"
     },
