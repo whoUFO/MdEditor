@@ -3,6 +3,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import jschardet from 'jschardet';
 import iconv from 'iconv-lite';
+import { getMainWindow } from '../window';
 
 const encodingMap: Record<string, string> = {
   'GB2312': 'gbk',
@@ -79,7 +80,8 @@ async function detectEncoding(buffer: Buffer): Promise<string> {
 
 export function registerFileIPC(): void {
   ipcMain.handle('files:open', async () => {
-    const { canceled, filePaths } = await dialog.showOpenDialog({
+    const mainWindow = getMainWindow();
+    const { canceled, filePaths } = await dialog.showOpenDialog(mainWindow, {
       properties: ['openFile'],
       filters: [
         { name: 'Markdown', extensions: ['md', 'markdown', 'txt'] },
@@ -152,7 +154,8 @@ export function registerFileIPC(): void {
   });
 
   ipcMain.handle('files:saveAs', async (_, content: string, encoding: string) => {
-    const { canceled, filePath } = await dialog.showSaveDialog({
+    const mainWindow = getMainWindow();
+    const { canceled, filePath } = await dialog.showSaveDialog(mainWindow, {
       defaultPath: 'document.md',
       filters: [
         { name: 'Markdown', extensions: ['md', 'markdown'] },
