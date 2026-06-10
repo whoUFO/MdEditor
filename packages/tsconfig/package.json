@@ -2,6 +2,8 @@
   "name": "@markdown-editor/tsconfig",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
+  "author": "Hu Yufeng <hyf2k@163.com>",
   "main": "index.json",
   "files": ["base.json", "react.json", "electron.json"]
 }

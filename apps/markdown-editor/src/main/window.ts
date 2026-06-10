@@ -31,6 +31,7 @@ export async function createWindow(): Promise<void> {
     mainWindow.webContents.openDevTools();
   } else {
     await mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'));
+    mainWindow.webContents.openDevTools();
   }
 
   mainWindow.on('closed', () => {

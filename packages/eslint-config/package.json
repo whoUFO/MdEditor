@@ -2,6 +2,8 @@
   "name": "@markdown-editor/eslint-config",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
+  "author": "Hu Yufeng <hyf2k@163.com>",
   "main": "index.js",
   "scripts": {
     "typecheck": "echo 'No typecheck needed'",

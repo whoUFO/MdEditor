@@ -2,6 +2,8 @@
   "name": "@markdown-editor/monorepo",
   "version": "0.2.0",
   "private": true,
+  "license": "MIT",
+  "author": "Hu Yufeng <hyf2k@163.com>",
   "type": "module",
   "packageManager": "pnpm@9.15.0",
   "scripts": {

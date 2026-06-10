@@ -1,5 +1,4 @@
 import DOMPurify from 'dompurify';
-import { JSDOM } from 'jsdom';
 import { ExportConfig, ExportResult, ExportTemplate, TemplateOptions } from './types';
 import { TemplateEngine } from './engine';
 import { TOCHelper } from './toc';
@@ -7,6 +6,30 @@ import { ALL_TEMPLATES, DEFAULT_EXPORT_TEMPLATE } from './templates';
 
 const isBrowser = typeof window !== 'undefined';
 const isNode = typeof process !== 'undefined' && process.versions?.node;
+
+/**
+ * Parse HTML string into DOM in browser or Node.js environment
+ */
+function parseHTML(html: string): Document {
+  if (isBrowser) {
+    const parser = new DOMParser();
+    return parser.parseFromString(html, 'text/html');
+  }
+  // Node.js environment - dynamic import of jsdom
+  const { JSDOM } = require('jsdom');
+  return new JSDOM(html).window.document;
+}
+
+/**
+ * Create a window object for DOMPurify in browser or Node.js environment
+ */
+function getSanitizeWindow(): Window {
+  if (isBrowser) {
+    return window;
+  }
+  const { JSDOM } = require('jsdom');
+  return new JSDOM('').window;
+}
 
 export class HTMLExporter {
   private templates: Map<string, ExportTemplate>;
@@ -144,13 +167,17 @@ export class HTMLExporter {
   }
 
   private sanitize(html: string): string {
-    const window = new JSDOM('').window;
-    return DOMPurify(window).sanitize(html);
+    if (isBrowser) {
+      return DOMPurify.sanitize(html);
+    }
+    const window = getSanitizeWindow();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return DOMPurify(window as any).sanitize(html);
   }
 
   private extractTOC(html: string): Array<{ id: string; text: string; level: number }> {
-    const dom = new JSDOM(html);
-    const headings = dom.window.document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+    const doc = parseHTML(html);
+    const headings = doc.querySelectorAll('h1, h2, h3, h4, h5, h6');
 
     return Array.from(headings).map(h => {
       const level = parseInt(h.tagName[1], 10);
