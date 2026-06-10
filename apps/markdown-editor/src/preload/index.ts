@@ -22,6 +22,15 @@ const electronAPI: ElectronAPI = {
   },
   printToPDF: () => ipcRenderer.invoke('print:pdf'),
   exportToPDF: (html: string, fileName: string) => ipcRenderer.invoke('export:pdf', html, fileName),
+  onFileOpened: (callback: (event: unknown, data: { path: string; name: string; content: string; encoding: string }) => void) => {
+    ipcRenderer.on('file:opened', callback);
+  },
+  onMenuSave: (callback: () => void) => {
+    ipcRenderer.on('menu:save', callback);
+  },
+  onMenuSaveAs: (callback: () => void) => {
+    ipcRenderer.on('menu:saveAs', callback);
+  },
 };
 
 contextBridge.exposeInMainWorld('electronAPI', electronAPI);

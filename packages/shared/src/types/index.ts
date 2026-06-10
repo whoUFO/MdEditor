@@ -65,6 +65,9 @@ export interface ElectronAPI {
   };
   printToPDF: () => Promise<void>;
   exportToPDF: (html: string, fileName: string) => Promise<void>;
+  onFileOpened: (callback: (event: unknown, data: { path: string; name: string; content: string; encoding: string }) => void) => void;
+  onMenuSave: (callback: () => void) => void;
+  onMenuSaveAs: (callback: () => void) => void;
 }
 
 declare global {

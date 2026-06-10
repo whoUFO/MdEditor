@@ -1,5 +1,45 @@
 import { Menu, app, dialog } from 'electron';
 import { getMainWindow } from './window';
+import fs from 'fs/promises';
+import path from 'path';
+import jschardet from 'jschardet';
+import iconv from 'iconv-lite';
+
+const encodingMap: Record<string, string> = {
+  'GB2312': 'gbk',
+  'GBK': 'gbk',
+  'GB18030': 'gbk',
+  'Big5': 'big5',
+  'Shift_JIS': 'shift_jis',
+  'ISO-8859-1': 'latin1',
+  'windows-1252': 'win1252',
+  'UTF-8': 'utf-8',
+  'ASCII': 'ascii',
+  'UTF-16': 'utf16',
+  'UTF-16BE': 'utf16-be',
+  'UTF-16LE': 'utf16-le',
+};
+
+function normalizeEncoding(encoding: string): string {
+  if (!encoding || typeof encoding !== 'string') {
+    return 'utf-8';
+  }
+  const normalized = encoding.toUpperCase().trim();
+  const mapped = encodingMap[normalized];
+  if (mapped) return mapped;
+  if (iconv.encodingExists(encoding)) return encoding;
+  return 'utf-8';
+}
+
+async function detectEncoding(buffer: Buffer): Promise<string> {
+  if (!buffer || buffer.length === 0) return 'utf-8';
+  const result = jschardet.detect(buffer);
+  if (!result || !result.encoding) return 'utf-8';
+  const normalized = normalizeEncoding(result.encoding);
+  if (normalized === 'ascii' && buffer.some(byte => byte > 127)) return 'utf-8';
+  if (result.confidence && result.confidence < 0.5 && !buffer.some(byte => byte > 127)) return 'utf-8';
+  return normalized;
+}
 
 export function setupMenu(): void {
   const menuTemplate = [
@@ -9,7 +49,28 @@ export function setupMenu(): void {
         {
           label: '打开',
           accelerator: 'CmdOrCtrl+O',
-          click: () => getMainWindow()?.webContents.send('menu:open'),
+          click: async () => {
+            const mainWindow = getMainWindow();
+            const { canceled, filePaths } = await dialog.showOpenDialog(mainWindow, {
+              properties: ['openFile'],
+              filters: [
+                { name: 'Markdown', extensions: ['md', 'markdown', 'txt'] },
+                { name: 'All Files', extensions: ['*'] },
+              ],
+            });
+            if (!canceled && filePaths && filePaths.length > 0) {
+              const filePath = filePaths[0];
+              const buffer = await fs.readFile(filePath);
+              const encoding = await detectEncoding(buffer);
+              const content = iconv.decode(buffer, encoding);
+              mainWindow?.webContents.send('file:opened', {
+                path: filePath,
+                name: path.basename(filePath),
+                content,
+                encoding,
+              });
+            }
+          },
         },
         {
           label: '保存',

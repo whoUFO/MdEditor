@@ -1,0 +1,5 @@
+[
+  ["open", "http://localhost:5174"],
+  ["wait", "--load", "networkidle"],
+  ["snapshot", "-i"]
+]
