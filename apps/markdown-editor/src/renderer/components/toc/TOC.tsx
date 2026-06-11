@@ -27,6 +27,7 @@ export function TOC(): React.JSX.Element {
   const [toc, setToc] = useState<TocItem[]>([]);
   const [activeId, setActiveId] = useState<string>('');
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
+  const gotoLine = useEditorStore((state) => state.gotoLine);
 
   useEffect(() => {
     const parsed = parseToc(debouncedContent);
@@ -42,7 +43,6 @@ export function TOC(): React.JSX.Element {
       if (!previewContent) return;
 
       const headings = previewContent.querySelectorAll('h1, h2, h3, h4, h5, h6');
-      const scrollTop = previewContent.scrollTop;
 
       let currentHeading: Element | null = null;
       headings.forEach((heading) => {
@@ -102,8 +102,10 @@ export function TOC(): React.JSX.Element {
     });
   }, []);
 
-  const handleItemClick = useCallback((id: string) => {
+  const handleItemClick = useCallback((id: string, line: number) => {
     setActiveId(id);
+    gotoLine(line);
+
     const element = document.getElementById(id);
     if (element) {
       const previewContent = document.querySelector('.preview-content');
@@ -111,7 +113,7 @@ export function TOC(): React.JSX.Element {
         element.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }
-  }, []);
+  }, [gotoLine]);
 
   const renderTocGroup = (group: TocGroup, depth: number = 0) => {
     const hasChildren = group.children.length > 0;
@@ -121,7 +123,7 @@ export function TOC(): React.JSX.Element {
       <div key={group.id} className="toc-group" style={{ marginLeft: depth * 12 }}>
         <div
           className={`toc-item level-${group.level} ${activeId === group.id ? 'active' : ''}`}
-          onClick={() => handleItemClick(group.id)}
+          onClick={() => handleItemClick(group.id, group.line)}
         >
           {hasChildren && (
             <button

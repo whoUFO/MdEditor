@@ -9,6 +9,7 @@ interface EditorStore extends EditorState {
   markDirty: (dirty: boolean) => void;
   insertText: (text: string, at?: number) => void;
   getSelectedText: () => string;
+  gotoLine: (line: number) => void;
 }
 
 export const useEditorStore = create<EditorStore>((set, get) => ({
@@ -64,5 +65,9 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       return content.slice(selection.from, selection.to);
     }
     return '';
+  },
+
+  gotoLine: (line) => {
+    set({ cursorPosition: { line, column: 1 } });
   },
 }));

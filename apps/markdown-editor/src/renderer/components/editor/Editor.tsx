@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { EditorView, lineNumbers } from '@codemirror/view';
+import { EditorSelection } from '@codemirror/state';
 import { basicSetup } from 'codemirror';
 import { markdown, markdownLanguage } from '@codemirror/lang-markdown';
 import { languages } from '@codemirror/language-data';
@@ -17,10 +18,11 @@ export function setEditorScrollHandler(handler: (scrollTop: number) => void) {
 export function Editor(): React.JSX.Element {
   const editorRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
-  const { content, setContent, setCursorPosition, setSelection } = useEditorStore();
+  const { content, setContent, setCursorPosition, setSelection, cursorPosition } = useEditorStore();
   const { syncScroll } = useUIStore();
   const { wordWrap, lineNumbers: showLineNumbers } = useSettingsStore();
   const isSyncingRef = useRef(false);
+  const lastProgrammaticLineRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (!editorRef.current) return;
@@ -31,14 +33,21 @@ export function Editor(): React.JSX.Element {
         if (update.docChanged) {
           setContent(update.state.doc.toString());
         }
-        
+
         const cursor = update.state.selection.main.head;
         const line = update.state.doc.lineAt(cursor);
-        setCursorPosition({ 
-          line: line.number, 
-          column: cursor - line.from + 1 
-        });
-        
+        const newLine = line.number;
+        const newColumn = cursor - line.from + 1;
+
+        if (lastProgrammaticLineRef.current === newLine) {
+          lastProgrammaticLineRef.current = null;
+        } else {
+          setCursorPosition({
+            line: newLine,
+            column: newColumn,
+          });
+        }
+
         const selection = update.state.selection;
         if (selection.ranges.length > 0 && !selection.main.empty) {
           setSelection({
@@ -103,6 +112,27 @@ export function Editor(): React.JSX.Element {
       });
     }
   }, [content]);
+
+  useEffect(() => {
+    if (!viewRef.current) return;
+    const view = viewRef.current;
+    const doc = view.state.doc;
+
+    if (cursorPosition.line < 1 || cursorPosition.line > doc.lines) return;
+
+    const line = doc.line(cursorPosition.line);
+    const pos = line.from + Math.max(0, cursorPosition.column - 1);
+
+    if (lastProgrammaticLineRef.current === cursorPosition.line) return;
+    lastProgrammaticLineRef.current = cursorPosition.line;
+
+    view.dispatch({
+      selection: EditorSelection.cursor(pos),
+      scrollIntoView: true,
+    });
+
+    view.focus();
+  }, [cursorPosition.line, cursorPosition.column]);
 
   return <div ref={editorRef} className="editor" />;
 }

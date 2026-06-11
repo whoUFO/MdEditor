@@ -133,11 +133,11 @@ export async function renderMarkdown(content: string): Promise<string> {
 
 export const parseMarkdown = renderMarkdown;
 
-export function parseToc(content: string): { level: number; text: string; id: string }[] {
+export function parseToc(content: string): { level: number; text: string; id: string; line: number }[] {
   const lines = content.split('\n');
-  const toc: { level: number; text: string; id: string }[] = [];
+  const toc: { level: number; text: string; id: string; line: number }[] = [];
 
-  lines.forEach((line) => {
+  lines.forEach((line, index) => {
     const match = line.match(/^(#{1,6})\s+(.+)$/);
     if (match) {
       const text = match[2].trim();
@@ -146,6 +146,7 @@ export function parseToc(content: string): { level: number; text: string; id: st
         level: match[1].length,
         text,
         id,
+        line: index + 1,
       });
     }
   });
