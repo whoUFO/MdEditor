@@ -120,7 +120,7 @@ export function TOC(): React.JSX.Element {
     const isExpanded = !collapsedGroups.has(group.id);
 
     return (
-      <div key={group.id} className="toc-group" style={{ marginLeft: depth * 12 }}>
+      <div key={`${group.line}:${group.id}`} className="toc-group" style={{ marginLeft: depth * 12 }}>
         <div
           className={`toc-item level-${group.level} ${activeId === group.id ? 'active' : ''}`}
           onClick={() => handleItemClick(group.id, group.line)}

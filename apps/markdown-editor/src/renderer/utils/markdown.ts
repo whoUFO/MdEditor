@@ -21,14 +21,19 @@ mermaid.initialize({
 
 function remarkAddHeadingIds() {
   return (tree: Root) => {
+    const idCount = new Map<string, number>();
     visit(tree, 'heading', (node: Heading) => {
       const textNode = node.children.find((child): child is Text => child.type === 'text');
-      if (textNode) {
-        const id = textNode.value.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
-        node.data = node.data || {};
-        node.data.hProperties = node.data.hProperties || {};
-        node.data.hProperties.id = id;
-      }
+      const rawId = textNode
+        ? textNode.value.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '')
+        : '';
+      const baseId = rawId || `heading`;
+      const count = idCount.get(baseId) ?? 0;
+      const id = count === 0 ? baseId : `${baseId}-${count}`;
+      idCount.set(baseId, count + 1);
+      node.data = node.data || {};
+      node.data.hProperties = node.data.hProperties || {};
+      node.data.hProperties.id = id;
     });
   };
 }
@@ -136,12 +141,17 @@ export const parseMarkdown = renderMarkdown;
 export function parseToc(content: string): { level: number; text: string; id: string; line: number }[] {
   const lines = content.split('\n');
   const toc: { level: number; text: string; id: string; line: number }[] = [];
+  const idCount = new Map<string, number>();
 
   lines.forEach((line, index) => {
     const match = line.match(/^(#{1,6})\s+(.+)$/);
     if (match) {
       const text = match[2].trim();
-      const id = text.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
+      const rawId = text.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
+      const baseId = rawId || 'heading';
+      const count = idCount.get(baseId) ?? 0;
+      const id = count === 0 ? baseId : `${baseId}-${count}`;
+      idCount.set(baseId, count + 1);
       toc.push({
         level: match[1].length,
         text,
