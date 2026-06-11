@@ -1,5 +1,5 @@
 import React from 'react';
-import { FolderOpen, Save, FileDown, Eye, EyeOff, Sun, Moon, Bold, Italic, Code, Heading1, List, ListOrdered, Quote, Code2, Link, Image, Minus, PanelLeft, PanelLeftClose, ArrowDownUp, Settings } from 'lucide-react';
+import { FolderOpen, Save, FileEdit, Eye, EyeOff, Sun, Moon, Bold, Italic, Code, Heading1, List, ListOrdered, Quote, Code2, Link, Image, Minus, PanelLeft, PanelLeftClose, ArrowDownUp, Settings } from 'lucide-react';
 import { useFileStore } from '../../stores/fileStore';
 import { useUIStore } from '../../stores/uiStore';
 import { useEditorStore } from '../../stores/editorStore';
@@ -85,7 +85,7 @@ export function Toolbar({ onOpenSettings }: ToolbarProps): React.JSX.Element {
           <Save size={18} />
         </button>
         <button onClick={() => saveAsFile()} title="另存为 (Ctrl+Shift+S)" data-testid="save-as-btn">
-          <FileDown size={18} />
+          <FileEdit size={18} />
         </button>
       </div>
 

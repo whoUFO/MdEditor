@@ -4,7 +4,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -12,7 +12,7 @@
 }
 
 .export-dialog {
-  background: var(--bg-primary);
+  background: #ffffff;
   border-radius: 12px;
   width: 90%;
   max-width: 700px;

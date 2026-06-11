@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ExportTemplate, TemplateOptions, ExportConfig } from '../types';
+import { ExportTemplate, TemplateOptions, ExportConfig, ExportPageSettings } from '../types';
 import { TemplateSelector } from './TemplateSelector';
 import { StyleCustomizer } from './StyleCustomizer';
 
@@ -11,6 +11,7 @@ interface ExportDialogProps {
   onPreview?: (html: string) => void;
   onClose?: () => void;
   isOpen?: boolean;
+  pageSettings?: ExportPageSettings;
 }
 
 export const ExportDialog: React.FC<ExportDialogProps> = ({
@@ -21,6 +22,7 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
   onPreview,
   onClose,
   isOpen = true,
+  pageSettings,
 }) => {
   const [selectedTemplateId, setSelectedTemplateId] = useState(initialTemplateId);
   const [options, setOptions] = useState<TemplateOptions>(() => {
@@ -73,7 +75,7 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
 
       const config: ExportConfig = {
         templateId: selectedTemplateId,
-        options,
+        options: { ...options, pageSettings },
         variables: {
           title: variables.title || 'Untitled',
           author: variables.author,
@@ -104,7 +106,7 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
     try {
       const config: ExportConfig = {
         templateId: selectedTemplateId,
-        options,
+        options: { ...options, pageSettings },
         variables: {
           title: variables.title || 'Untitled',
           author: variables.author,

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Download, X, FileText, Layout, BookOpen, File } from 'lucide-react';
 import { ALL_TEMPLATES } from '@markdown-editor/html-export';
 import type { ExportConfig } from '@markdown-editor/html-export';
+import { useSettingsStore } from '../../stores/settingsStore';
 import './ExportDialog.css';
 
 interface ExportDialogProps {
@@ -32,6 +33,8 @@ export function ExportDialog({
   const [showTOC, setShowTOC] = useState(true);
   const [fontSize, setFontSize] = useState(16);
   const [lineHeight, setLineHeight] = useState(1.6);
+  
+  const settings = useSettingsStore();
 
   if (!isOpen) return null;
 
@@ -46,9 +49,10 @@ export function ExportDialog({
         fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
         maxWidth: '900px',
         showPageNumbers: false,
-        printOptimized: false,
+        printOptimized: selectedTemplate === 'print',
         highlightTheme: 'github',
         mathEnabled: true,
+        pageSettings: settings.exportPageSettings,
       },
       variables: {
         title: currentFilename?.replace(/\.md$/, '') || 'Untitled',
@@ -74,9 +78,10 @@ export function ExportDialog({
         fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
         maxWidth: '900px',
         showPageNumbers: false,
-        printOptimized: false,
+        printOptimized: selectedTemplate === 'print',
         highlightTheme: 'github',
         mathEnabled: true,
+        pageSettings: settings.exportPageSettings,
       },
     };
     onPreview(selectedTemplate);

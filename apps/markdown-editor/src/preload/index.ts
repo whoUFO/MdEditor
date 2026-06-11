@@ -21,7 +21,7 @@ const electronAPI: ElectronAPI = {
     getPlatform: () => ipcRenderer.invoke('app:getPlatform'),
   },
   printToPDF: () => ipcRenderer.invoke('print:pdf'),
-  exportToPDF: (html: string, fileName: string) => ipcRenderer.invoke('export:pdf', html, fileName),
+  exportToPDF: (html: string, fileName: string, pageSettings?: unknown) => ipcRenderer.invoke('export:pdf', html, fileName, pageSettings),
   onFileOpened: (callback: (event: unknown, data: { path: string; name: string; content: string; encoding: string }) => void) => {
     ipcRenderer.on('file:opened', callback);
   },

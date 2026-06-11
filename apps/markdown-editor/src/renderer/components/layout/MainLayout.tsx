@@ -10,11 +10,37 @@ import { ExportDialog } from '../export/ExportDialog';
 import { useUIStore } from '../../stores/uiStore';
 import { useFileStore } from '../../stores/fileStore';
 import { useEditorStore } from '../../stores/editorStore';
+import { useSettingsStore } from '../../stores/settingsStore';
 import { renderMarkdown } from '../../utils/markdown';
 import { FolderOpen, BookOpen, FileText, Download, Clock } from 'lucide-react';
 import { HTMLExporter, ALL_TEMPLATES } from '@markdown-editor/html-export';
 import type { ExportConfig } from '@markdown-editor/html-export';
 import './MainLayout.css';
+
+const PAPER_SIZES: Record<string, { width: number; height: number }> = {
+  A4: { width: 210, height: 297 },
+  Letter: { width: 215.9, height: 279.4 },
+  Legal: { width: 215.9, height: 355.6 },
+  A3: { width: 297, height: 420 },
+  A5: { width: 148, height: 210 },
+};
+
+const LINE_HEIGHT_VALUES: Record<string, number> = {
+  single: 1.2,
+  '1.5x': 1.5,
+  double: 2.0,
+};
+
+function convertToMM(value: number, unit: 'mm' | 'cm' | 'inch'): number {
+  switch (unit) {
+    case 'cm':
+      return value * 10;
+    case 'inch':
+      return value * 25.4;
+    default:
+      return value;
+  }
+}
 
 type SidebarTab = 'files' | 'toc' | 'recent';
 
@@ -26,6 +52,7 @@ export function MainLayout({ onOpenSettings }: MainLayoutProps): React.JSX.Eleme
   const { previewVisible, splitRatio, sidebarVisible, toggleSidebar, setSplitRatio } = useUIStore();
   const { currentFile, saveFile } = useFileStore();
   const { content } = useEditorStore();
+  const { exportPageSettings } = useSettingsStore();
   const [sidebarTab, setSidebarTab] = useState<SidebarTab>('files');
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
   
@@ -157,22 +184,137 @@ export function MainLayout({ onOpenSettings }: MainLayoutProps): React.JSX.Eleme
   };
 
   const handleExportPDF = async () => {
-    const html = await renderMarkdown(content);
-    const highlightCSS = `
-      .hljs { display: block; overflow-x: auto; padding: 0.5em; color: #333; background: #f8f8fa; }
-      .hljs-comment, .hljs-quote { color: #998; font-style: italic; }
-      .hljs-keyword, .hljs-selector-tag, .hljs-subst { color: #333; font-weight: bold; }
-      .hljs-number, .hljs-literal { color: #008080; }
-      .hljs-string { color: #d14; }
-      .hljs-title, .hljs-section { color: #900; font-weight: bold; }
-      .hljs-type { color: #458; font-weight: bold; }
-      .hljs-tag { color: #000080; }
-      .hljs-regexp { color: #009926; }
-      .hljs-symbol { color: #990073; }
-      .hljs-built_in { color: #0086b3; }
-      .hljs-meta { color: #999; font-weight: bold; }
-    `;
-    const fullHTML = `
+    try {
+      const html = await renderMarkdown(content);
+      
+      const pageSettings = exportPageSettings;
+      const paperSize = pageSettings.paperSize;
+      const isCustom = paperSize === 'custom';
+      const pageWidth = isCustom ? pageSettings.customWidth : PAPER_SIZES[paperSize].width;
+      const pageHeight = isCustom ? pageSettings.customHeight : PAPER_SIZES[paperSize].height;
+      
+      const margins = pageSettings.margins;
+      const unit = pageSettings.marginUnit;
+      const top = convertToMM(margins.top, unit);
+      const right = convertToMM(margins.right, unit);
+      const bottom = convertToMM(margins.bottom, unit);
+      const left = convertToMM(margins.left, unit);
+      
+      const lineHeight = pageSettings.fonts.lineHeight === 'custom' 
+        ? pageSettings.fonts.customLineHeight 
+        : LINE_HEIGHT_VALUES[pageSettings.fonts.lineHeight];
+      
+      const highlightCSS = `
+        .hljs { display: block; overflow-x: auto; padding: 0.5em; color: #333; background: #f8f8fa; }
+        .hljs-comment, .hljs-quote { color: #998; font-style: italic; }
+        .hljs-keyword, .hljs-selector-tag, .hljs-subst { color: #333; font-weight: bold; }
+        .hljs-number, .hljs-literal { color: #008080; }
+        .hljs-string { color: #d14; }
+        .hljs-title, .hljs-section { color: #900; font-weight: bold; }
+        .hljs-type { color: #458; font-weight: bold; }
+        .hljs-tag { color: #000080; }
+        .hljs-regexp { color: #009926; }
+        .hljs-symbol { color: #990073; }
+        .hljs-built_in { color: #0086b3; }
+        .hljs-meta { color: #999; font-weight: bold; }
+      `;
+      
+      const pageNumbers = pageSettings.pageNumbers || {
+      enabled: true,
+      position: 'bottom-right' as const,
+      format: 'page/total' as const,
+      fontSize: 12,
+      fontColor: '#666666',
+    };
+    const pageNumberCSS = pageNumbers.enabled ? `
+        @page {
+          size: ${pageWidth}mm ${pageHeight}mm;
+          margin: ${top}mm ${right}mm ${bottom}mm ${left}mm;
+          
+          @top-left {
+            content: ${pageNumbers.position.startsWith('top-left') ? getPageNumberContent() : '""'};
+            font-size: ${pageNumbers.fontSize}px;
+            color: ${pageNumbers.fontColor};
+            font-family: '${pageSettings.fonts.bodyFont}', sans-serif;
+          }
+          @top-center {
+            content: ${pageNumbers.position === 'top-center' ? getPageNumberContent() : '""'};
+            font-size: ${pageNumbers.fontSize}px;
+            color: ${pageNumbers.fontColor};
+            font-family: '${pageSettings.fonts.bodyFont}', sans-serif;
+          }
+          @top-right {
+            content: ${pageNumbers.position.startsWith('top-right') ? getPageNumberContent() : '""'};
+            font-size: ${pageNumbers.fontSize}px;
+            color: ${pageNumbers.fontColor};
+            font-family: '${pageSettings.fonts.bodyFont}', sans-serif;
+          }
+          @bottom-left {
+            content: ${pageNumbers.position.startsWith('bottom-left') ? getPageNumberContent() : '""'};
+            font-size: ${pageNumbers.fontSize}px;
+            color: ${pageNumbers.fontColor};
+            font-family: '${pageSettings.fonts.bodyFont}', sans-serif;
+          }
+          @bottom-center {
+            content: ${pageNumbers.position === 'bottom-center' ? getPageNumberContent() : '""'};
+            font-size: ${pageNumbers.fontSize}px;
+            color: ${pageNumbers.fontColor};
+            font-family: '${pageSettings.fonts.bodyFont}', sans-serif;
+          }
+          @bottom-right {
+            content: ${pageNumbers.position.startsWith('bottom-right') ? getPageNumberContent() : '""'};
+            font-size: ${pageNumbers.fontSize}px;
+            color: ${pageNumbers.fontColor};
+            font-family: '${pageSettings.fonts.bodyFont}', sans-serif;
+          }
+        }
+        
+        body {
+          counter-reset: page;
+        }
+        
+        .page-number::before {
+          counter-increment: page;
+        }
+      ` : `
+        @page {
+          size: ${pageWidth}mm ${pageHeight}mm;
+          margin: ${top}mm ${right}mm ${bottom}mm ${left}mm;
+        }
+      `;
+
+    function getPageNumberContent(): string {
+      switch (pageNumbers.format) {
+        case 'page':
+          return 'counter(page)';
+        case 'page/total':
+          return 'counter(page) "/" counter(pages)';
+        case 'page of total':
+          return '"第" counter(page) "页，共" counter(pages) "页"';
+        default:
+          return 'counter(page)';
+      }
+    }
+
+    const pageCSS = `
+        ${pageNumberCSS}
+        body {
+          font-family: '${pageSettings.fonts.bodyFont}', sans-serif;
+          font-size: ${pageSettings.fonts.bodySize}px;
+          line-height: ${lineHeight};
+        }
+        h1, h2, h3, h4, h5, h6 {
+          font-family: '${pageSettings.fonts.titleFont}', serif;
+        }
+        h1 { font-size: ${pageSettings.fonts.titleSize}px; }
+        h2 { font-size: ${pageSettings.fonts.titleSize * 0.85}px; }
+        h3 { font-size: ${pageSettings.fonts.titleSize * 0.7}px; }
+        h4 { font-size: ${pageSettings.fonts.titleSize * 0.6}px; }
+        h5 { font-size: ${pageSettings.fonts.titleSize * 0.55}px; }
+        h6 { font-size: ${pageSettings.fonts.titleSize * 0.5}px; }
+      `;
+      
+      const fullHTML = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -180,23 +322,20 @@ export function MainLayout({ onOpenSettings }: MainLayoutProps): React.JSX.Eleme
   <title>${currentFile?.name || 'Document'}</title>
   <style>
     ${highlightCSS}
+    ${pageCSS}
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 40px 20px;
-      line-height: 1.6;
+      max-width: 100%;
+      margin: 0;
+      padding: 0;
       color: #333;
     }
     h1, h2, h3, h4, h5, h6 { 
-      margin-top: 1.5em; 
+      margin-top: 1em; 
       margin-bottom: 0.5em; 
       font-weight: 600;
     }
-    h1 { font-size: 2em; border-bottom: 2px solid #eaecef; padding-bottom: 0.3em; }
-    h2 { font-size: 1.5em; border-bottom: 1px solid #eaecef; padding-bottom: 0.3em; }
-    h3 { font-size: 1.25em; }
-    h4 { font-size: 1em; }
+    h1 { border-bottom: 2px solid #eaecef; padding-bottom: 0.3em; }
+    h2 { border-bottom: 1px solid #eaecef; padding-bottom: 0.3em; }
     pre { 
       padding: 16px; 
       background: #f6f8fa; 
@@ -263,16 +402,19 @@ export function MainLayout({ onOpenSettings }: MainLayoutProps): React.JSX.Eleme
 </head>
 <body>${html}</body>
 </html>`;
-
-    if (window.electronAPI) {
-      await window.electronAPI.exportToPDF(fullHTML, currentFile?.name || 'document');
-    } else {
-      const printWindow = window.open('', '_blank');
-      if (printWindow) {
-        printWindow.document.write(fullHTML);
-        printWindow.document.close();
-        printWindow.print();
+      
+      if (window.electronAPI) {
+        await window.electronAPI.exportToPDF(fullHTML, currentFile?.name || 'document', exportPageSettings);
+      } else {
+        const printWindow = window.open('', '_blank');
+        if (printWindow) {
+          printWindow.document.write(fullHTML);
+          printWindow.document.close();
+          printWindow.print();
+        }
       }
+    } catch (error) {
+      console.error('[Renderer] Export PDF error:', error);
     }
   };
 
@@ -352,7 +494,7 @@ export function MainLayout({ onOpenSettings }: MainLayoutProps): React.JSX.Eleme
           <Download size={14} />
           <span>导出 HTML</span>
         </button>
-        <button className="export-btn" onClick={handleExportPDF}>
+        <button className="export-btn" onClick={handleExportPDF} data-testid="export-pdf-btn">
           <FileText size={14} />
           <span>导出 PDF</span>
         </button>

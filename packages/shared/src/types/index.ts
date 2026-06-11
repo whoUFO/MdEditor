@@ -42,6 +42,40 @@ export interface Settings {
   spellCheck: boolean;
 }
 
+export interface PageMargins {
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
+}
+
+export interface FontSettings {
+  titleFont: string;
+  titleSize: number;
+  bodyFont: string;
+  bodySize: number;
+  lineHeight: 'single' | '1.5x' | 'double' | 'custom';
+  customLineHeight: number;
+}
+
+export interface PageNumberSettings {
+  enabled: boolean;
+  position: 'bottom-right' | 'bottom-center' | 'bottom-left' | 'top-right' | 'top-center' | 'top-left';
+  format: 'page' | 'page/total' | 'page of total';
+  fontSize: number;
+  fontColor: string;
+}
+
+export interface ExportPageSettings {
+  paperSize: 'A4' | 'Letter' | 'Legal' | 'A3' | 'A5' | 'custom';
+  customWidth: number;
+  customHeight: number;
+  margins: PageMargins;
+  marginUnit: 'mm' | 'cm' | 'inch';
+  fonts: FontSettings;
+  pageNumbers: PageNumberSettings;
+}
+
 export type ConfirmResult = 'save' | 'discard' | 'cancel';
 
 export interface ElectronAPI {
@@ -64,7 +98,7 @@ export interface ElectronAPI {
     getPlatform: () => Promise<string>;
   };
   printToPDF: () => Promise<void>;
-  exportToPDF: (html: string, fileName: string) => Promise<void>;
+  exportToPDF: (html: string, fileName: string, pageSettings?: ExportPageSettings) => Promise<void>;
   onFileOpened: (callback: (event: unknown, data: { path: string; name: string; content: string; encoding: string }) => void) => void;
   onMenuSave: (callback: () => void) => void;
   onMenuSaveAs: (callback: () => void) => void;

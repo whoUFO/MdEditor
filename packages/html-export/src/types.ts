@@ -1,3 +1,28 @@
+export interface PageMargins {
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
+}
+
+export interface FontSettings {
+  titleFont: string;
+  titleSize: number;
+  bodyFont: string;
+  bodySize: number;
+  lineHeight: 'single' | '1.5x' | 'double' | 'custom';
+  customLineHeight: number;
+}
+
+export interface ExportPageSettings {
+  paperSize: 'A4' | 'Letter' | 'Legal' | 'A3' | 'A5' | 'custom';
+  customWidth: number;
+  customHeight: number;
+  margins: PageMargins;
+  marginUnit: 'mm' | 'cm' | 'inch';
+  fonts: FontSettings;
+}
+
 export interface TemplateOptions {
   theme: 'light' | 'dark' | 'custom';
   fontFamily: string;
@@ -10,6 +35,7 @@ export interface TemplateOptions {
   highlightTheme: string;
   mathEnabled: boolean;
   customCSS?: string;
+  pageSettings?: ExportPageSettings;
 }
 
 export interface TemplateVariables {
