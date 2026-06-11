@@ -60,7 +60,7 @@ export const useFileStore = create<FileStore>((set, get) => ({
       } else {
         result = await window.electronAPI.files.open();
       }
-      
+
       if (result) {
         const file: FileState = {
           path: result.path,
@@ -73,6 +73,7 @@ export const useFileStore = create<FileStore>((set, get) => ({
         useEditorStore.getState().loadContent(result.content);
       }
     } catch (error) {
+      console.error('Error opening file:', error);
       set({ error: 'Failed to open file' });
     } finally {
       set({ isLoading: false });

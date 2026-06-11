@@ -21,67 +21,27 @@ const encodingMap: Record<string, string> = {
 };
 
 function normalizeEncoding(encoding: string): string {
-  if (!encoding || typeof encoding !== 'string') {
-    console.warn('normalizeEncoding: Invalid encoding, using utf-8');
-    return 'utf-8';
-  }
-  
+  if (!encoding || typeof encoding !== 'string') return 'utf-8';
   const normalized = encoding.toUpperCase().trim();
-  const mapped = encodingMap[normalized];
-  
-  if (mapped) {
-    return mapped;
-  }
-  
-  if (iconv.encodingExists(encoding)) {
-    return encoding;
-  }
-  
-  console.warn(`normalizeEncoding: Unknown encoding "${encoding}", using utf-8`);
+  if (encodingMap[normalized]) return encodingMap[normalized];
+  if (iconv.encodingExists(encoding)) return encoding;
   return 'utf-8';
 }
 
 async function detectEncoding(buffer: Buffer): Promise<string> {
-  if (!buffer || buffer.length === 0) {
-    console.log('detectEncoding: Empty buffer, using utf-8');
-    return 'utf-8';
-  }
-  
+  if (!buffer || buffer.length === 0) return 'utf-8';
   const result = jschardet.detect(buffer);
-  
-  if (!result || !result.encoding) {
-    console.log('detectEncoding: No encoding detected, using utf-8');
-    return 'utf-8';
-  }
-  
-  const detected = result.encoding;
-  const normalized = normalizeEncoding(detected);
-  
-  console.log(`detectEncoding: Detected "${detected}", normalized to "${normalized}" (confidence: ${result.confidence})`);
-  
-  const hasNonASCII = buffer.some(byte => byte > 127);
-  
-  if (normalized === 'ascii' && hasNonASCII) {
-    console.log('detectEncoding: Detected ASCII but buffer contains non-ASCII bytes, using utf-8');
-    return 'utf-8';
-  }
-  
-  if (result.confidence && result.confidence < 0.5) {
-    if (hasNonASCII) {
-      console.log(`detectEncoding: Low confidence (${result.confidence}) but has non-ASCII, using ${normalized}`);
-      return normalized;
-    }
-    console.log('detectEncoding: Low confidence and no non-ASCII, using utf-8');
-    return 'utf-8';
-  }
-  
+  if (!result || !result.encoding) return 'utf-8';
+  const normalized = normalizeEncoding(result.encoding);
+  if (normalized === 'ascii' && buffer.some(byte => byte > 127)) return 'utf-8';
+  if (result.confidence && result.confidence < 0.5 && !buffer.some(byte => byte > 127)) return 'utf-8';
   return normalized;
 }
 
 export function registerFileIPC(): void {
   ipcMain.handle('files:open', async () => {
     const mainWindow = getMainWindow();
-    const { canceled, filePaths } = await dialog.showOpenDialog(mainWindow, {
+    const { canceled, filePaths } = await dialog.showOpenDialog(mainWindow || undefined, {
       properties: ['openFile'],
       filters: [
         { name: 'Markdown', extensions: ['md', 'markdown', 'txt'] },
@@ -89,16 +49,12 @@ export function registerFileIPC(): void {
       ],
     });
 
-    if (canceled || filePaths.length === 0) {
-      return null;
-    }
+    if (canceled || filePaths.length === 0) return null;
 
     const filePath = filePaths[0];
     const buffer = await fs.readFile(filePath);
     const encoding = await detectEncoding(buffer);
     const content = iconv.decode(buffer, encoding);
-
-    console.log(`files:open: ${filePath}, encoding: ${encoding}, content length: ${content.length}`);
 
     return {
       path: filePath,
@@ -113,17 +69,8 @@ export function registerFileIPC(): void {
       const buffer = await fs.readFile(filePath);
       const encoding = await detectEncoding(buffer);
       const content = iconv.decode(buffer, encoding);
-
-      console.log(`files:openPath: ${filePath}, encoding: ${encoding}, content length: ${content.length}`);
-
-      return {
-        path: filePath,
-        name: path.basename(filePath),
-        content,
-        encoding,
-      };
-    } catch (error) {
-      console.error('Open file failed:', error);
+      return { path: filePath, name: path.basename(filePath), content, encoding };
+    } catch {
       return null;
     }
   });
@@ -131,31 +78,19 @@ export function registerFileIPC(): void {
   ipcMain.handle('files:save', async (_, filePath: string, content: string, encoding: string) => {
     try {
       let finalEncoding = normalizeEncoding(encoding);
-      
-      if (finalEncoding === 'ascii') {
-        const hasNonASCII = content.split('').some(char => char.charCodeAt(0) > 127);
-        if (hasNonASCII) {
-          console.log(`files:save: Content contains non-ASCII characters, changing encoding from ASCII to UTF-8`);
-          finalEncoding = 'utf-8';
-        }
+      if (finalEncoding === 'ascii' && content.split('').some(char => char.charCodeAt(0) > 127)) {
+        finalEncoding = 'utf-8';
       }
-      
-      const buffer = iconv.encode(content, finalEncoding);
-      await fs.writeFile(filePath, buffer);
-      
-      console.log(`files:save: ${filePath}, encoding: ${finalEncoding}, buffer length: ${buffer.length}`);
-      console.log(`files:save: Success`);
-      
+      await fs.writeFile(filePath, iconv.encode(content, finalEncoding));
       return true;
-    } catch (error) {
-      console.error('Save failed:', error);
+    } catch {
       return false;
     }
   });
 
   ipcMain.handle('files:saveAs', async (_, content: string, encoding: string) => {
     const mainWindow = getMainWindow();
-    const { canceled, filePath } = await dialog.showSaveDialog(mainWindow, {
+    const { canceled, filePath } = await dialog.showSaveDialog(mainWindow || undefined, {
       defaultPath: 'document.md',
       filters: [
         { name: 'Markdown', extensions: ['md', 'markdown'] },
@@ -164,30 +99,16 @@ export function registerFileIPC(): void {
       ],
     });
 
-    if (canceled || !filePath) {
-      return null;
-    }
+    if (canceled || !filePath) return null;
 
     try {
       let finalEncoding = normalizeEncoding(encoding);
-      
-      if (finalEncoding === 'ascii') {
-        const hasNonASCII = content.split('').some(char => char.charCodeAt(0) > 127);
-        if (hasNonASCII) {
-          console.log(`files:saveAs: Content contains non-ASCII characters, changing encoding from ASCII to UTF-8`);
-          finalEncoding = 'utf-8';
-        }
+      if (finalEncoding === 'ascii' && content.split('').some(char => char.charCodeAt(0) > 127)) {
+        finalEncoding = 'utf-8';
       }
-      
-      const buffer = iconv.encode(content, finalEncoding);
-      await fs.writeFile(filePath, buffer);
-      
-      console.log(`files:saveAs: ${filePath}, encoding: ${finalEncoding}, buffer length: ${buffer.length}`);
-      console.log(`files:saveAs: Success`);
-      
+      await fs.writeFile(filePath, iconv.encode(content, finalEncoding));
       return filePath;
-    } catch (error) {
-      console.error('Save failed:', error);
+    } catch {
       return null;
     }
   });
@@ -200,8 +121,7 @@ export function registerFileIPC(): void {
         path: path.join(dirPath, entry.name),
         type: entry.isDirectory() ? 'directory' : 'file',
       }));
-    } catch (error) {
-      console.error('Read directory failed:', error);
+    } catch {
       return [];
     }
   });
