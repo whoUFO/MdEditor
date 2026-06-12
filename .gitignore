@@ -48,6 +48,21 @@ coverage
 # Electron
 out-main
 
+# Electron build outputs
+apps/markdown-editor/release
+release
+packages/*/release
+
+# Test artifacts
+apps/markdown-editor/playwright-report
+apps/markdown-editor/test-results
+apps/markdown-editor/src/test/e2e/pdf-export-test.js
+apps/markdown-editor/src/test/e2e/pdf-export.spec.ts
+test-export.md
+test-output/
+test-pdf-export-simple.cjs
+test-pdf-export.cjs
+
 # TypeScript
 *.tsbuildinfo
 
